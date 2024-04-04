@@ -9,8 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class RijndaelTest {
     @Test
     public void basicEncryption() {
-        String inputText = "The quick brown fox jumps over the lazy dog.";
-        String cipherKey = "e4 d9 09 c2 90 d0 fb 1c a0 68 ff ad df 22 cb d0";
+        String inputText = "32 43 f6 a8 88 5a 30 8d 31 31 98 a2 e0 37 07 34";
+        String cipherKey = "2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c";
         Rijndael aes = new Rijndael(inputText, cipherKey);
     }
 }
