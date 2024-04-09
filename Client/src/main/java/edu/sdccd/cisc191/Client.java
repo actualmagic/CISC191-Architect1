@@ -91,7 +91,8 @@ public class Client extends Application{
                 "Enigma",
                 "Morse Code",
                 "Phonetic Cipher",
-                "Nihilist Cipher"
+                "Nihilist Cipher",
+                "AES Cipher"
         );
 
         //Get Help Button
@@ -118,6 +119,11 @@ public class Client extends Application{
                     break;
                 case "Phonetic Cipher":
                     AlertBox.display("Phonetic Cipher", "There is no key!");
+                    break;
+                case "Nihilist Cipher":
+                    AlertBox.display("Nihilist Cipher", "First entry is key for the message\n"+
+                            "Second entry is key for Polybius Square" +
+                            "Both entries are words");
                     break;
             }
         }
@@ -186,6 +192,14 @@ public class Client extends Application{
             if(cipherList.getValue() == "Enigma"){
                 enigmaWindow();
             }
+            else if(cipherList.getValue() == "Morse Code"){
+                layout2.getChildren().clear();
+                layout2.getChildren().addAll(cipherList, help);
+            }
+            else if(cipherList.getValue() == "Phonetic Cipher"){
+                layout2.getChildren().clear();
+                layout2.getChildren().addAll(cipherList, help);
+            }
             else if(cipherList.getValue() == "Nihilist Cipher"){
                 TextField squareKey = new TextField();
                 layout2.getChildren().clear();
@@ -194,6 +208,22 @@ public class Client extends Application{
                     outputText = Nihilist.encode(messageInput.getText(), key.getText(), squareKey.getText());
                     outputWindow();
                 });
+            }
+            else if(cipherList.getValue() == "AES Cipher"){
+                HBox comboBoxes = new HBox(10);
+                ComboBox<String> aesMode = new ComboBox<>();
+                aesMode.getItems().addAll(
+                        "ECB",
+                        "CTR"
+                );
+                ComboBox<String> aesBoolean = new ComboBox<>();
+                aesBoolean.getItems().addAll(
+                        "True",
+                        "False"
+                );
+                layout2.getChildren().clear();
+                layout2.getChildren().addAll(key, aesMode, aesBoolean, cipherList, help);
+
             }
             else{
                 layout2.getChildren().clear();
