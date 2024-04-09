@@ -18,6 +18,7 @@ import org.jsoup.nodes.Document;
 import java.net.*;
 import java.io.*;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Scanner;
 
 
@@ -123,7 +124,7 @@ public class Client extends Application{
                 case "Nihilist Cipher":
                     AlertBox.display("Nihilist Cipher", "First entry is key for the message\n"+
                             "Second entry is key for Polybius Square" +
-                            "Both entries are words");
+                            "\nBoth entries are words");
                     break;
             }
         }
@@ -223,6 +224,20 @@ public class Client extends Application{
                 );
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(key, aesMode, aesBoolean, cipherList, help);
+                encode.setOnAction(w -> {
+                    boolean flag = false;
+                    flag = Objects.equals(aesBoolean.getValue(), "True");
+                    Rijndael rijndael = new Rijndael(messageInput.getText(), key.getText(), aesMode.getValue(), flag);
+                    outputText = rijndael.encode();
+                    outputWindow();
+                });
+                decode.setOnAction(w -> {
+                    boolean flag = false;
+                    flag = Objects.equals(aesBoolean.getValue(), "True");
+                    Rijndael rijndael = new Rijndael(messageInput.getText(), key.getText(), aesMode.getValue(), flag);
+                    outputText = rijndael.decode();
+                    outputWindow();
+                });
 
             }
             else{
