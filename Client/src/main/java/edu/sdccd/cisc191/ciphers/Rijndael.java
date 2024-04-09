@@ -1,6 +1,7 @@
 package edu.sdccd.cisc191.ciphers;
 
 import java.util.Arrays;
+import java.util.Random;
 
 public class Rijndael {
     private static final byte[] S_BOX = {
@@ -175,9 +176,17 @@ public class Rijndael {
     private byte[] initialKey = new byte[16];
     private byte[][] expandedKeys = new byte[10][16];
     private byte[][] state = new byte[4][4];
+    private String mode;
+    private long[] initVector = new long[2];
 
-    public Rijndael(String inputText, String cipherKey) {
-        this.inputText = inputText;
+    public Rijndael(String inputText, String cipherKey, String mode) {
+        this.inputText = inputText.replaceAll(" ", "");;
+        this.mode = mode;
+
+        if(mode.equals("CTR")) {
+            initVector[0] = Long.parseUnsignedLong(cipherKey.substring(32,48),16);
+            initVector[1] = Long.parseUnsignedLong(cipherKey.substring(48,64),16);
+        }
 
         cipherKey = cipherKey.replaceAll(" ", "");
         for(int i=0; i<32; i+=8)
@@ -203,13 +212,66 @@ public class Rijndael {
     }
 
     public String encode() {
-        //TODO Convert plaintext to hexstring
-        inputText = inputText.replaceAll(" ", "");
+        StringBuilder output = new StringBuilder();
 
+        switch(mode) {
+            case "ECB":
+                isoPadding();
+
+                for(int i=0; i<inputText.length()/32; i++) {
+                    encryption(i);
+                    output.append(getStateAsHex());
+                }
+
+                return output.toString();
+            case "CTR":
+                String plainText = inputText;
+
+                for(int i=0; i<plainText.length()/32 + 0.99; i++) {
+                    inputText = Long.toHexString(initVector[0]) + Long.toHexString(initVector[1]);
+                    encryption(0);
+                    byte[] c = getStateAsBytes();
+
+                    for(int j=0; j<16; j++) {
+                        if(32*i+2*j >= plainText.length())
+                            break;
+                        byte b = (byte) ((Character.digit(plainText.charAt(32*i+2*j),16) << 4) +
+                                Character.digit(plainText.charAt(32*i+2*j+1),16));
+                        output.append(String.format("%02X ", (byte) ((c[j] & 0xff) ^ b)));
+                    }
+
+                    initVector[1]++;
+                    initVector[1] %= Long.MAX_VALUE;
+                }
+
+                return output.toString();
+        }
+
+        return "";
+    }
+
+    public String decode() {
+        StringBuilder output = new StringBuilder();
+
+        switch(mode) {
+            case "ECB":
+                for(int i=0; i<inputText.length()/32; i++) {
+                    decryption(i);
+                    output.append(getStateAsHex());
+                }
+
+                return output.toString();
+            case "CTR":
+                return encode();
+        }
+        return "";
+    }
+
+    private void encryption(int currBlock) {
         for(int i=0; i<16; i++)
             initialKey[i] = (byte) (((cipherKey[i/4] << i*8) >>> 24) & 0xff);
 
-        createState();
+        createState(currBlock);
 
         for(int round=0; round<9; round++) {
             subBytes();
@@ -221,16 +283,12 @@ public class Rijndael {
         subBytes();
         shiftRows(0);
         addRoundKey(9);
-
-        return getStateAsHex();
     }
 
-    public String decode() {
-        inputText = inputText.replaceAll(" ", "");
+    private void decryption(int currBlock) {
+        initialKey = Arrays.copyOf(expandedKeys[9],16);
 
-        initialKey = expandedKeys[9];
-
-        createState();
+        createState(currBlock);
 
         for(int i=0; i<16; i++)
             expandedKeys[9][i] = (byte) (((cipherKey[i/4] << i*8) >>> 24) & 0xff);
@@ -246,7 +304,21 @@ public class Rijndael {
         invSubBytes();
         addRoundKey(9);
 
-        return getStateAsHex();
+        expandedKeys[9] = initialKey;
+    }
+
+    private void isoPadding() {
+        int paddingLength = 16 - ((inputText.length()/2) % 16);
+
+        if(paddingLength%16>0){
+            inputText += "80";
+            paddingLength --;
+        }
+
+        while(paddingLength%16>0){
+            inputText += "00";
+            paddingLength--;
+        }
     }
 
     private String getStateAsHex() {
@@ -259,11 +331,21 @@ public class Rijndael {
         return sb.toString();
     }
 
-    private void createState() {
+    private byte[] getStateAsBytes() {
+        byte[] ret = new byte[16];
+        for(int j=0; j<4; j++) {
+            for(int i=0; i<4; i++) {
+                ret[j*4+i] = state[i][j];
+            }
+        }
+        return ret;
+    }
+
+    private void createState(int currBlock) {
         for(int i=0; i<4; i++) {
             for(int j=0; j<4; j++) {
-                state[j][i] = (byte) (((Character.digit(inputText.charAt(i*8+j*2),16) << 4) +
-                        Character.digit(inputText.charAt(i*8+j*2+1),16)) ^ initialKey[i*4+j]);
+                state[j][i] = (byte) (((Character.digit(inputText.charAt(currBlock*32 + i*8+j*2),16) << 4) +
+                        Character.digit(inputText.charAt(currBlock*32 + i*8+j*2+1),16)) ^ initialKey[i*4+j]);
             }
         }
     }
