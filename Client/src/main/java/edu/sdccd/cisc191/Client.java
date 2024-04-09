@@ -43,6 +43,7 @@ public class Client extends Application{
     private static Stage window;
     private static Scene mainScene;
     private static Scene enigmaScene;
+    private static Scene nihilistScene;
     private static String outputText;
 
     public void startConnection(String ip, int port) throws IOException {
@@ -89,7 +90,8 @@ public class Client extends Application{
                 "MD4 Hash",
                 "Enigma",
                 "Morse Code",
-                "Phonetic Cipher"
+                "Phonetic Cipher",
+                "Nihilist Cipher"
         );
 
         //Get Help Button
@@ -169,6 +171,7 @@ public class Client extends Application{
                 throw new RuntimeException(ex);
             }
         });
+
         //layout for getting the link
         HBox layout4 = new HBox(10);
         layout4.setAlignment(Pos.CENTER);
@@ -178,6 +181,39 @@ public class Client extends Application{
         HBox layout2 = new HBox(10);
         layout2.getChildren().addAll(key, cipherList, help);
         layout2.setAlignment(Pos.CENTER);
+
+        cipherList.setOnAction(e -> {
+            if(cipherList.getValue() == "Enigma"){
+                enigmaWindow();
+            }
+            else if(cipherList.getValue() == "Nihilist Cipher"){
+                TextField squareKey = new TextField();
+                layout2.getChildren().clear();
+                layout2.getChildren().addAll(key, squareKey, cipherList, help);
+                encode.setOnAction(h -> {
+                    outputText = Nihilist.encode(messageInput.getText(), key.getText(), squareKey.getText());
+                    outputWindow();
+                });
+            }
+            else{
+                layout2.getChildren().clear();
+                layout2.getChildren().addAll(key, cipherList, help);
+            }
+//            switch(cipherList.getValue()){
+//                case "Enigma":
+//                    enigmaWindow();
+//                    break;
+//                case "Nihilist Cipher":
+//                    TextField squareKey = new TextField();
+//                    layout2.getChildren().clear();
+//                    layout2.getChildren().addAll(key, squareKey, cipherList, help);
+//                    encode.setOnAction(h -> {
+//                        outputText = Nihilist.encode(messageInput.getText(), key.getText(), squareKey.getText());
+//                        outputWindow();
+//                    });
+//            }
+        });
+
 
         //layout for encode and decode buttons
         HBox layout3 = new HBox(10);
@@ -189,14 +225,7 @@ public class Client extends Application{
         layout.setAlignment(Pos.CENTER);
         layout.getChildren().addAll(label, layout2, layout3, messageInput, files, layout4);
 
-        //listens for enigma selection and sets scene to enigmaWindow
-        cipherList.setOnAction(e -> {
-            switch(cipherList.getValue()){
-                case "Enigma":
-                    enigmaWindow();
-                    break;
-            }
-        });
+
 
         //shows the scene
         mainScene = new Scene(layout, 800,600);
@@ -562,6 +591,10 @@ public class Client extends Application{
         enigmaScene = new Scene(layout, 800, 600);
         window.setScene(enigmaScene);
     }
+
+//    public static void nihilistScene(){
+//
+//    }
 
     /**************************************************************************
      * Gets URL of website

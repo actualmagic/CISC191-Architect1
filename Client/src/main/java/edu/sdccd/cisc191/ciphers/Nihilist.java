@@ -39,6 +39,9 @@ public class Nihilist {
             if (c == ' ') {
                 continue;
             }
+            if(c == 'J'){
+                c = 'I';
+            }
             ArrayList<Integer> textCoordinates = findCoordinates(polybiusSquare, c);
             StringBuilder textCoordinatesCombined = new StringBuilder();
             for (int coord : textCoordinates) {

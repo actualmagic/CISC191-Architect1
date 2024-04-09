@@ -13,7 +13,7 @@ class NihilistTest {
     void encode() {
         squareKey = "zebras";
         key = "nihilist";
-        plainText = "abcdefghiklmnopqrstuvwxyz";
-        assertEquals("56 45 53 55 46 56 46 76 73 65 65 67 75 74 64 89 55 53 76 83 86 85 75 100 52", Nihilist.encode(plainText,key, squareKey));
+        plainText = "abcdefghijklmnopqrstuvwxyz";
+        assertEquals("56 45 53 55 46 56 46 76 73 64 64 66 69 73 63 88 85 46 52 77 85 84 74 99 96 43", Nihilist.encode(plainText,key, squareKey));
     }
 }
