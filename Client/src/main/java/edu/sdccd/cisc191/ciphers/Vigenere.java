@@ -2,7 +2,7 @@ package edu.sdccd.cisc191.ciphers;
 
 import edu.sdccd.cisc191.CipherTools;
 
-import java.util.Arrays;
+import java.util.*;
 
 /**************************************************************************
  * Vigenere Cipher encryption, decryption and cryptanalysis
@@ -56,7 +56,7 @@ public class Vigenere extends CipherTools {
         String noPunct = inputText.toUpperCase().replaceAll("[^A-Z]", "");
         int keyLength = findKeyLength(noPunct);
 
-        String key = "";
+        String[] key = {"", "", "", "", ""};
         char[][] charArr = new char[keyLength][noPunct.length()/keyLength + 1];
         int[][] letterFreq = new int[keyLength][26];
 
@@ -65,22 +65,41 @@ public class Vigenere extends CipherTools {
             charArr[i%keyLength][i/keyLength] = (noPunct.charAt(i));
 
         for(int row=0; row<charArr.length; row++) {     //Iterate through each row which is essentially a caesar cipher
-            letterFreq[row] = getLetterFrequency(Arrays.toString(charArr[row]));
+            letterFreq[row] = getLetterFrequency(charArr[row]);
 
-            double[] chiSquared = new double[26];
+            //double[] chiSquared = new double[26];
+            HashMap<Integer, Double> chiSquared = new HashMap<>();
             int chiLow = 0;
 
             for(int shift=0; shift<26; shift++) {   //Iterates through each caesar cipher shift
-                chiSquared[shift] = chiSquareTestShifted(charArr.length, letterFreq[row], shift);
-                if(chiSquared[shift]<chiSquared[chiLow])
+                chiSquared.put(shift, chiSquareTestShifted(charArr.length, letterFreq[row], shift));
+                if(chiSquared.get(shift)<chiLow)
                     chiLow = shift;
             }
 
-            key += (char) (chiLow + 'A');           //Creates key word
+            PriorityQueue<Double> maxHeap = new PriorityQueue<>();
+
+            for(int i=0; i<26; i++)
+                maxHeap.add(chiSquared.get(i));
+
+            for(int i=0; i<5; i++) {
+                double d = maxHeap.poll();
+                boolean done = false;
+                int iterator = 0;
+                while(!done) {
+                    if(chiSquared.get(iterator) == d) {
+                        key[i] += (char) (iterator + 'A');
+                        done = true;
+                    }
+                    iterator++;
+                }
+            }
         }
 
+        for(String k : key)
+            System.out.println(k);
 
-        return decode(inputText, key);
+        return decode(inputText, key[0]);
     }
 
     /**************************************************************************
@@ -125,7 +144,7 @@ public class Vigenere extends CipherTools {
             //Stores letter frequencies of all characters
             for (int row=0; row<keyLength; row++) {
                 char[] charRow = letterRows[row];
-                letterFrequency[row] = getLetterFrequency(Arrays.toString(charRow));
+                letterFrequency[row] = getLetterFrequency(charRow);
 
                 friedmanArr[row] = findIndexOfCoincidence(charRow.length, letterFrequency[row]);
             }

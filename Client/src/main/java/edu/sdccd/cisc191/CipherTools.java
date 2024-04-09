@@ -1,14 +1,5 @@
 package edu.sdccd.cisc191;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-
 /**************************************************************************
  * Set of utilities to be used across all the ciphers
  * @author Oliver Tran
@@ -24,11 +15,22 @@ public class CipherTools {
      * @param inputText Plaintext with only alphabetical characters
      * @return Array of letter frequencies
      *************************************************************************/
-    public static int[] getLetterFrequency(String inputText) {
+    public static <T> int[] getLetterFrequency(T inputText) {
         int[] letterFrequency = new int[26];
-        for(int i=0; i<inputText.length(); i++) {
-            letterFrequency[inputText.charAt(i) - 'A']++;
+
+        if (inputText.getClass() == String.class) {
+            String input = (String) inputText;
+            for(int i=0; i<input.length(); i++) {
+                int temp = input.charAt(i) - 'A';
+                letterFrequency[((String) inputText).charAt(i) - 'A']++;
+            }
+        } else if (inputText.getClass() == char[].class) {
+            for (int i=0; i<((char[]) inputText).length; i++) {
+                if(((char[]) inputText)[i] >65)
+                    letterFrequency[((char[]) inputText)[i] - 'A']++;
+            }
         }
+
         return letterFrequency;
     }
 
