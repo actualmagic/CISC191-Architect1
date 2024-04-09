@@ -179,7 +179,15 @@ public class Rijndael {
     private String mode;
     private long[] initVector = new long[2];
 
-    public Rijndael(String inputText, String cipherKey, String mode) {
+    public Rijndael(String inputText, String cipherKey, String mode, boolean isHex) {
+        if(!isHex) {
+            StringBuilder sb = new StringBuilder();
+            byte[] chars = inputText.getBytes();
+            for (byte aChar : chars)
+                sb.append(String.format("%02X", aChar));
+            inputText = sb.toString();
+        }
+
         this.inputText = inputText.replaceAll(" ", "");;
         this.mode = mode;
 
