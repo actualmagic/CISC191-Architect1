@@ -93,7 +93,8 @@ public class Client extends Application{
                 "Morse Code",
                 "Phonetic Cipher",
                 "Nihilist Cipher",
-                "AES Cipher"
+                "AES Cipher",
+                "RailFence Cipher"
         );
 
         //Get Help Button
@@ -125,6 +126,9 @@ public class Client extends Application{
                     AlertBox.display("Nihilist Cipher", "First entry is key for the message\n"+
                             "Second entry is key for Polybius Square" +
                             "\nBoth entries are words");
+                    break;
+                case "RailFence Cipher":
+                    AlertBox.display("RailFence Cipher", "The key must be a number");
                     break;
             }
         }
@@ -335,6 +339,14 @@ public class Client extends Application{
             case "Phonetic Cipher":
                 outputText = Phonetic.printPhoneticEncoded(inputText);
                 outputWindow();
+                break;
+            case "RailFence Cipher":
+                try {
+                    outputText = RailFence.encode(inputText, key);
+                    outputWindow();
+                } catch (NumberFormatException e) {
+                    AlertBox.display("Error", "ERROR!\nThe key must be a number");
+                }
                 break;
         }
     }
