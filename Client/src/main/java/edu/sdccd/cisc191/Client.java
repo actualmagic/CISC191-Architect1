@@ -3,6 +3,7 @@ package edu.sdccd.cisc191;
 import edu.sdccd.cisc191.ciphers.*;
 import edu.sdccd.cisc191.hashes.MD4;
 import edu.sdccd.cisc191.hashes.MD4Engine;
+import edu.sdccd.cisc191.hashes.SHA2;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -93,7 +94,8 @@ public class Client extends Application{
                 "Morse Code",
                 "Phonetic Cipher",
                 "Nihilist Cipher",
-                "AES Cipher"
+                "AES Cipher",
+                "SHA2"
         );
 
         //Get Help Button
@@ -131,7 +133,7 @@ public class Client extends Application{
     );
 
         //labels
-        Label label = new Label("Enter key:");
+        Label keyLabel = new Label("Enter key:");
 
         //text input
         TextField key = new TextField();
@@ -189,15 +191,21 @@ public class Client extends Application{
         layout2.getChildren().addAll(key, cipherList, help);
         layout2.setAlignment(Pos.CENTER);
 
+        HBox label = new HBox(10);
+        label.getChildren().addAll(keyLabel);
+        label.setAlignment(Pos.CENTER);
+
         cipherList.setOnAction(e -> {
             if(cipherList.getValue() == "Enigma"){
                 enigmaWindow();
             }
             else if(cipherList.getValue() == "Morse Code"){
+                label.getChildren().clear();
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(cipherList, help);
             }
             else if(cipherList.getValue() == "Phonetic Cipher"){
+                label.getChildren().clear();
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(cipherList, help);
             }
@@ -240,7 +248,19 @@ public class Client extends Application{
                 });
 
             }
+            else if(cipherList.getValue() == "SHA2"){
+                label.getChildren().clear();
+                layout2.getChildren().clear();
+                layout2.getChildren().addAll(cipherList, help);
+                encode.setOnAction(h -> {
+                    SHA2 sha2 = new SHA2(messageInput.getText());
+                    outputText = sha2.runHash();
+                    outputWindow();
+                });
+            }
             else{
+                label.getChildren().clear();
+                label.getChildren().add(keyLabel);
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(key, cipherList, help);
             }
