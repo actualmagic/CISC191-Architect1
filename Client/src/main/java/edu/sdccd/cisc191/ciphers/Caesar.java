@@ -2,6 +2,8 @@ package edu.sdccd.cisc191.ciphers;
 
 import edu.sdccd.cisc191.CipherTools;
 
+import java.util.HashMap;
+
 /**************************************************************************
  * Caesar cipher encryption, decryption, and cryptanalysis
  * @author Oliver Tran
@@ -64,14 +66,48 @@ public class Caesar extends CipherTools {
         String noPunct = inputText.toUpperCase().replaceAll("[^A-Z]", "");
         int[] letterFreq = getLetterFrequency(noPunct);
 
+        HashMap<Double, Integer> map = new HashMap<Double, Integer>();
         double[] chiSquared = new double[26];
         int chiLow = 0;
         for(int shift=0; shift<26; shift++) {   //Iterates through each caesar cipher shift
             chiSquared[shift] = chiSquareTestShifted(noPunct.length(), letterFreq, shift);
             if(chiSquared[shift]<chiSquared[chiLow])
                 chiLow = shift;
+            map.put(chiSquared[shift], shift);
+        }
+
+        quickSort(chiSquared, 0, chiSquared.length -1);
+
+        for(int i=0; i<5; i++) {
+            System.out.println(map.get(chiSquared[25-i]) + "\t" + chiSquared[i]); //From the sorted chiSquared
         }
 
         return decode(inputText, String.valueOf(chiLow));
+    }
+
+    private static void quickSort(double[] chiSquared, int start, int end) {
+        if(end<=start) return;
+        int pivot = partition(chiSquared, start, end);
+        quickSort(chiSquared, start, pivot-1);
+        quickSort(chiSquared, pivot+1, end);
+    }
+
+    private static int partition(double[] chiSquared, int start, int end){
+        double pivot = chiSquared[end];
+        int i = start - 1;
+        for(int j = start; j<= end -1; j++){
+            if(chiSquared[j] < pivot){
+                i++;
+                double temp = chiSquared[i];
+                chiSquared[i] = chiSquared[j];
+                chiSquared[j] = temp;
+            }
+        }
+        i++;
+        double temp = chiSquared[i];
+        chiSquared[i] = chiSquared[end];
+        chiSquared[end] = temp;
+
+        return i;
     }
 }
