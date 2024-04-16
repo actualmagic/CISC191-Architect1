@@ -209,6 +209,10 @@ public class Client extends Application{
                     outputText = Nihilist.encode(messageInput.getText(), key.getText(), squareKey.getText());
                     outputWindow();
                 });
+                decode.setOnAction(h -> {
+                    outputText = Nihilist.decode(messageInput.getText(), key.getText(), squareKey.getText());
+                    outputWindow();
+                });
             }
             else if(cipherList.getValue() == "AES Cipher"){
                 HBox comboBoxes = new HBox(10);
