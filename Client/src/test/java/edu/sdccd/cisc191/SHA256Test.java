@@ -17,4 +17,10 @@ class SHA256Test {
         SHA2 sha2 = new SHA2("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq");
         assertEquals("248d6a61d20638b8e5c02693c3e6039a33ce45964ff2167f6ecedd419db06c1", sha2.runHash());
     }
+
+    @Test
+    void testEmpty() {
+        SHA2 sha2 = new SHA2("");
+        assertEquals("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", sha2.runHash());
+    }
 }
