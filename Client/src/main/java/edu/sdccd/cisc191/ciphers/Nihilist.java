@@ -94,8 +94,8 @@ public class Nihilist {
             String number = String.valueOf(c);
             char[] digits1 = number.toCharArray();
             if (number.length() == 2) {
-                int x = Character.getNumericValue(digits1[0]); // Convert character to integer
-                int y = Character.getNumericValue(digits1[1]); // Convert character to integer
+                int x = Character.getNumericValue(digits1[0]);
+                int y = Character.getNumericValue(digits1[1]);
                     char character = polybiusSquare[x-1][y-1];
                     decryptedMessage.append(character);
             }

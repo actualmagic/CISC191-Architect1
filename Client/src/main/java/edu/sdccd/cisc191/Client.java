@@ -272,6 +272,7 @@ public class Client extends Application{
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(key, cipherList, help);
                 encode.setOnAction(enc -> Client.encode(messageInput.getText(), key.getText(), cipherList.getValue()));
+                decode.setOnAction(enc -> Client.decode(messageInput.getText(), key.getText(), cipherList.getValue()));
             }
 //            switch(cipherList.getValue()){
 //                case "Enigma":
