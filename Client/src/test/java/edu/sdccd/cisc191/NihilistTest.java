@@ -16,4 +16,11 @@ class NihilistTest {
         plainText = "abcdefghijklmnopqrstuvwxyz";
         assertEquals("56 45 53 55 46 56 46 76 73 64 64 66 69 73 63 88 85 46 52 77 85 84 74 99 96 43", Nihilist.encode(plainText,key, squareKey));
     }
+    @Test
+    void decode() {
+        squareKey = "zebras";
+        key = "nihilist";
+        plainText = "56 45 53 55 46 56 46 76 73 64 64 66 69 73 63 88 85 46 52 77 85 84 74 99 96 43";
+        assertEquals("ABCDEFGHIIKLMNOPQRSTUVWXYZ", Nihilist.decode(plainText,key, squareKey));
+    }
 }
