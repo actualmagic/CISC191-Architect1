@@ -14,11 +14,16 @@ public class SHA2 {
     };
 
     private byte[] message;
-    private int[] schedule = new int[64];
+    private int[] schedule;
     private int t1, t2;
-    private int[] wVar = new int[8];
+    private final int[] wVar;
 
     public SHA2(String inputText) {
+        schedule = new int[64];
+        t1=0;
+        t2=0;
+        wVar = new int[8];
+
         int messageLength = inputText.length();
 
         //Padding
@@ -52,7 +57,8 @@ public class SHA2 {
     }
 
     public String runHash () {
-        int[] hash = INIT_HASH;
+        int[] hash = new int[8];
+        System.arraycopy(INIT_HASH, 0, hash, 0, 8);
 
         for(int iteration=0; iteration<message.length/64; iteration++) {
             prepareMessageSchedule(iteration);
