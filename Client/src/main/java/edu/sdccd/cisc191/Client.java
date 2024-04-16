@@ -413,6 +413,13 @@ public class Client extends Application{
             case "Phonetic Cipher":
                 outputText = Phonetic.printPhoneticDecoded(inputText);
                 outputWindow();
+            case "RailFence Cipher":
+                try {
+                    outputText = RailFence.decode(inputText, key);
+                    outputWindow();
+                } catch (NumberFormatException e) {
+                    AlertBox.display("Error", "ERROR!\nThe key must be a number");
+                }
                 break;
         }
     }

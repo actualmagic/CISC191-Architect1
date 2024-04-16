@@ -28,7 +28,7 @@ public class RailFence {
             return;
         }
 
-        railMatrix[row][col] = '*';
+        railMatrix[row][col] = message.charAt(col);
         col++;
 
         if (row == 0 || row == matrixHeight - 1) {
@@ -43,5 +43,67 @@ public class RailFence {
 
         // Update the downward flag in the recursive call
         encodeRecursive(railMatrix, message, row, col, matrixHeight, downward);
+    }
+
+    public static String decode(String encodedMessage, String height) {
+        int matrixHeight = Integer.parseInt(height);
+        char[][] railMatrix = new char[matrixHeight][encodedMessage.length()];
+
+        boolean downward = false;
+        int row = 0, col = 0;
+
+        for (int i = 0; i < encodedMessage.length(); i++) {
+            railMatrix[row][col] = '*';
+            col++;
+
+            if (row == 0 || row == matrixHeight - 1) {
+                downward = !downward;
+            }
+
+            if (downward) {
+                row = row + 1;
+            } else {
+                row = row - 1;
+            }
+        }
+
+        int index = 0;
+        for (int i = 0; i < matrixHeight; i++) {
+            for (int j = 0; j < encodedMessage.length(); j++) {
+                if (railMatrix[i][j] == '*') {
+                    railMatrix[i][j] = '-';
+                }
+            }
+        }
+
+        for (int i = 0; i < matrixHeight; i++) {
+            for (int j = 0; j < encodedMessage.length(); j++) {
+                if (railMatrix[i][j] == '-') {
+                    railMatrix[i][j] = encodedMessage.charAt(index++);
+                }
+            }
+        }
+
+        StringBuilder decodedMessage = new StringBuilder();
+        row = 0;
+        col = 0;
+        downward = false;
+
+        for (int i = 0; i < encodedMessage.length(); i++) {
+            decodedMessage.append(railMatrix[row][col]);
+            col++;
+
+            if (row == 0 || row == matrixHeight - 1) {
+                downward = !downward;
+            }
+
+            if (downward) {
+                row = row + 1;
+            } else {
+                row = row - 1;
+            }
+        }
+
+        return decodedMessage.toString();
     }
 }
