@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.StringTokenizer;
 
 public class Nihilist {
-    public static char[][] polybiusSquare(String key) {
+    private static char[][] polybiusSquare(String key) {
         key = key.toUpperCase();
         char[][] polybiusSquare = new char[5][5];
         HashSet<Character> keyChars = new HashSet<>();
