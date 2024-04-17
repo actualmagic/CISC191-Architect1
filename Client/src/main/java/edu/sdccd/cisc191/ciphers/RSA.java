@@ -9,7 +9,7 @@ public class RSA {
 
     public RSA(int keySize) {
         p = BigInteger.probablePrime(keySize/2, new Random());
-        q = BigInteger.probablePrime(keySize, new Random());
+        q = BigInteger.probablePrime(keySize/2, new Random());
         calculateValues();
     }
 
