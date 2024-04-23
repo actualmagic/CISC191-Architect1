@@ -8,9 +8,11 @@ public class RSA {
     private static final BigInteger e = new BigInteger("65537");
 
     public RSA(int keySize) {
-        p = BigInteger.probablePrime(keySize/2, new Random());
-        q = BigInteger.probablePrime(keySize/2, new Random());
-        calculateValues();
+        do {
+            p = BigInteger.probablePrime(keySize / 2, new Random());
+            q = BigInteger.probablePrime(keySize / 2, new Random());
+            calculateValues();
+        } while (n.mod(e).equals(BigInteger.ZERO));
     }
 
     public RSA(BigInteger[] secretPrimes) {

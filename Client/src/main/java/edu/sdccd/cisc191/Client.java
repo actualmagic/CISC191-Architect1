@@ -190,18 +190,18 @@ public class Client extends Application{
         layout2.setAlignment(Pos.CENTER);
 
         cipherList.setOnAction(e -> {
-            if(cipherList.getValue() == "Enigma"){
+            if(Objects.equals(cipherList.getValue(), "Enigma")){
                 enigmaWindow();
             }
-            else if(cipherList.getValue() == "Morse Code"){
+            else if(Objects.equals(cipherList.getValue(), "Morse Code")){
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(cipherList, help);
             }
-            else if(cipherList.getValue() == "Phonetic Cipher"){
+            else if(Objects.equals(cipherList.getValue(), "Phonetic Cipher")){
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(cipherList, help);
             }
-            else if(cipherList.getValue() == "Nihilist Cipher"){
+            else if(Objects.equals(cipherList.getValue(), "Nihilist Cipher")){
                 TextField squareKey = new TextField();
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(key, squareKey, cipherList, help);
@@ -210,7 +210,7 @@ public class Client extends Application{
                     outputWindow();
                 });
             }
-            else if(cipherList.getValue() == "AES Cipher"){
+            else if(Objects.equals(cipherList.getValue(), "AES Cipher")){
                 HBox comboBoxes = new HBox(10);
                 ComboBox<String> aesMode = new ComboBox<>();
                 aesMode.getItems().addAll(
@@ -225,14 +225,14 @@ public class Client extends Application{
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(key, aesMode, aesBoolean, cipherList, help);
                 encode.setOnAction(w -> {
-                    boolean flag = false;
+                    boolean flag;
                     flag = Objects.equals(aesBoolean.getValue(), "True");
                     Rijndael rijndael = new Rijndael(messageInput.getText(), key.getText(), aesMode.getValue(), flag);
                     outputText = rijndael.encode();
                     outputWindow();
                 });
                 decode.setOnAction(w -> {
-                    boolean flag = false;
+                    boolean flag;
                     flag = Objects.equals(aesBoolean.getValue(), "True");
                     Rijndael rijndael = new Rijndael(messageInput.getText(), key.getText(), aesMode.getValue(), flag);
                     outputText = rijndael.decode();
@@ -315,7 +315,7 @@ public class Client extends Application{
                 }
                 break;
             case "MD4 Hash":
-                if(key.toUpperCase().equals("LIST")) {
+                if(key.equalsIgnoreCase("LIST")) {
                     String[] list = inputText.split("\n");
                     StringBuilder output = new StringBuilder();
                     for(String str : list) {
