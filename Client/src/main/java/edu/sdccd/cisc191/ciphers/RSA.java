@@ -39,6 +39,14 @@ public class RSA {
         return new BigInteger[]{p, q};
     }
 
+    public BigInteger[] getDecryptionKey() {
+        return new BigInteger[]{n, d};
+    }
+
+    public BigInteger decode(BigInteger cipherText, BigInteger[] key) {
+        return cipherText.modPow(key[1], key[0]);
+    }
+
     public BigInteger decode(BigInteger cipherText) {
         return cipherText.modPow(d, n);
     }

@@ -15,8 +15,10 @@ import javafx.stage.Stage;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import java.math.BigInteger;
 import java.net.*;
 import java.io.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Scanner;
@@ -93,7 +95,8 @@ public class Client extends Application{
                 "Morse Code",
                 "Phonetic Cipher",
                 "Nihilist Cipher",
-                "AES Cipher"
+                "AES Cipher",
+                "RSA"
         );
 
         //Get Help Button
@@ -239,6 +242,32 @@ public class Client extends Application{
                     outputWindow();
                 });
 
+            }
+            else if(cipherList.getValue() == "RSA"){
+                ComboBox<Integer> temp= new ComboBox<>();
+                temp.getItems().addAll(
+                        1024,
+                        2048,
+                        4096
+                );
+                layout2.getChildren().clear();
+                layout2.getChildren().addAll(key, temp, cipherList, help);
+                encode.setOnAction(h ->{
+                    RSA rsa = new RSA(temp.getValue());
+                    BigInteger message = new BigInteger(messageInput.getText(),16);
+                    outputText = RSA.encode(message, rsa.getEncryptionKey()).toString(16);
+                    outputText += "\n\nSecret Primes: \n" + rsa.getSecretPrimes()[0].toString(16) + "\n" + rsa.getSecretPrimes()[1].toString(16);
+                    outputWindow();
+                });
+                decode.setOnAction(h ->{
+                    BigInteger message = new BigInteger(messageInput.getText(), 16);
+                    String[] primeString = key.getText().split(" ");
+                    BigInteger[] primes = new BigInteger[]{new BigInteger(primeString[0], 16), new BigInteger(primeString[1], 16)};
+
+                    RSA rsa = new RSA(primes);
+                    outputText = rsa.decode(message).toString(16);
+                    outputWindow();
+                });
             }
             else{
                 layout2.getChildren().clear();

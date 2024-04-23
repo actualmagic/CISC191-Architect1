@@ -34,6 +34,6 @@ class RSATest {
         cipherText = RSA.encode(inputText, alice.getEncryptionKey());
 
         alice = new RSA(alice.getSecretPrimes());
-        assertEquals(inputText.toString(16), alice.decode(cipherText).toString(16));
+        assertEquals(inputText.toString(16), alice.decode(cipherText, alice.getDecryptionKey()).toString(16));
     }
 }
