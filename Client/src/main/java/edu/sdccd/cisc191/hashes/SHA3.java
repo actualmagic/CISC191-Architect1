@@ -1,16 +1,20 @@
 package edu.sdccd.cisc191.hashes;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class SHA3 {
     private boolean [][][] state;
     private byte[] inputBytes;
     private boolean[] inputBits;
     private int width;
-    public SHA3 (String input, int b) {
+    private int r;
+
+    public SHA3 (String input, int b, int c, int d) {
         inputBytes = input.getBytes(StandardCharsets.UTF_8);
         inputBits = new boolean[b];
-        int width = b/25;
+        width = b/25;
+        r = 1600 - c;
 
         state = new boolean[5][5][width];
 
@@ -18,22 +22,25 @@ public class SHA3 {
         for(int i=0; i<inputBytes.length; i++) {
             for(int j=0; j<8; j++) {
                 byte temp = (byte) ((byte) (inputBytes[i] <<j) >>> 7);
-                if(temp == 0)
-                    inputBits[8*i+j] = false;
-                else
-                    inputBits[8*i+j] = true;
+                inputBits[8*i+j] = temp != 0;
             }
         }
 
-        for(int y=0; y<5; y++) {
-            for(int x=0; x<5; x++) {
-                for(int z=0; z<width; z++)
-                    state[x][y][z] = inputBits[width*(5*y+x)+z];
-            }
-        }
+        inputBits = Arrays.copyOf(inputBits, inputBits.length + r - (input.length()*8)%r - 1);
+        inputBits[input.length()*8] = true;
+        inputBits[inputBits.length-1] = true;
     }
 
-    public void keccak(int numRounds) {
+    public void sponge() {
+        int n = inputBytes.length/r;
+        boolean[] s = new boolean[width];
+        keccak(inputBits, 24);
+
+    }
+
+    private void keccak(boolean[] s, int numRounds) {
+        createState(s);
+
         for(int i = (int) (12 + 2*Math.log(width) - numRounds); i<12 + 2*Math.log(width) - 1; i++) {
             theta();
             rho();
@@ -59,7 +66,7 @@ public class SHA3 {
             for(int z=0; z<width; z++) {
                 d[x][z] = Boolean.logicalXor(c[(x+4)%5][z], c[(x+1)%5][(z+4)%width]);
             }
-        }
+        }   
 
         for(int y=0; y<5; y++) {
             for(int x=0; x<5; x++) {
@@ -148,7 +155,12 @@ public class SHA3 {
         return r[0];
     }
 
-    private void sponge(String n, int d) {
-
+    private void createState(boolean[] s) {
+        for(int y=0; y<5; y++) {
+            for(int x=0; x<5; x++) {
+                for(int z=0; z<width; z++)
+                    state[x][y][z] = s[width*(5*y+x)+z];
+            }
+        }
     }
 }

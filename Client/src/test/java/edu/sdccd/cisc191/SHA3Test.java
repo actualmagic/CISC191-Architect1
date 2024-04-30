@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class SHA3Test {
     @Test
     void testBasicHash() {
-        SHA3 sha3 = new SHA3("abc", 25);
-        sha3.keccak(13);
+        SHA3 sha3 = new SHA3("abc", 25,512, 256);
+        sha3.sponge();
     }
 }
