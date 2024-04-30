@@ -2,7 +2,8 @@ spring:
   application:
     name: trigram
   datasource:
-    url: jdbc:h2:mem:trigram;DB_CLOSE_ON_EXIT=FALSE;
+    #url: jdbc:h2:mem:trigram;DB_CLOSE_ON_EXIT=FALSE;
+    url: jdbc:h2:file:C:\Users\Vinh Tong\IdeaProjects\CISC191-Architect1\Architect\src\main\resources\data\trigram;AUTO_SERVER=true
     username: h2
     password: h2
     driver-class-name: org.h2.Driver
