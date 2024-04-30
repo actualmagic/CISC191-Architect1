@@ -20,6 +20,8 @@ import org.jsoup.nodes.Document;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -723,7 +725,7 @@ public class ArchitectApplication extends Application {
     public void stop() throws Exception {
         springContext.stop();
     }
-
+@Bean(initMethod =  "start", destroyMethod = "stop")
     public Server inMemoryDBServer() throws SQLException {
         return Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "9092");
     }
