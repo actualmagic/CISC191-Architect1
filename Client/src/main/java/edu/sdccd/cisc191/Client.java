@@ -16,8 +16,10 @@ import javafx.stage.Stage;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import java.math.BigInteger;
 import java.net.*;
 import java.io.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Scanner;
@@ -95,6 +97,7 @@ public class Client extends Application{
                 "Phonetic Cipher",
                 "Nihilist Cipher",
                 "AES Cipher",
+                "RSA",
                 "RailFence Cipher",
                 "SHA2"
         );
@@ -200,7 +203,7 @@ public class Client extends Application{
         label.setAlignment(Pos.CENTER);
 
         cipherList.setOnAction(e -> {
-            if(cipherList.getValue() == "Enigma"){
+            if(Objects.equals(cipherList.getValue(), "Enigma")){
                 enigmaWindow();
             }
             else if(cipherList.getValue() == "Morse Code"){
@@ -213,7 +216,7 @@ public class Client extends Application{
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(cipherList, help);
             }
-            else if(cipherList.getValue() == "Nihilist Cipher"){
+            else if(Objects.equals(cipherList.getValue(), "Nihilist Cipher")){
                 TextField squareKey = new TextField();
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(key, squareKey, cipherList, help);
@@ -226,7 +229,7 @@ public class Client extends Application{
                     outputWindow();
                 });
             }
-            else if(cipherList.getValue() == "AES Cipher"){
+            else if(Objects.equals(cipherList.getValue(), "AES Cipher")){
                 HBox comboBoxes = new HBox(10);
                 ComboBox<String> aesMode = new ComboBox<>();
                 aesMode.getItems().addAll(
@@ -241,20 +244,46 @@ public class Client extends Application{
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(key, aesMode, aesBoolean, cipherList, help);
                 encode.setOnAction(w -> {
-                    boolean flag = false;
+                    boolean flag;
                     flag = Objects.equals(aesBoolean.getValue(), "True");
                     Rijndael rijndael = new Rijndael(messageInput.getText(), key.getText(), aesMode.getValue(), flag);
                     outputText = rijndael.encode();
                     outputWindow();
                 });
                 decode.setOnAction(w -> {
-                    boolean flag = false;
+                    boolean flag;
                     flag = Objects.equals(aesBoolean.getValue(), "True");
                     Rijndael rijndael = new Rijndael(messageInput.getText(), key.getText(), aesMode.getValue(), flag);
                     outputText = rijndael.decode();
                     outputWindow();
                 });
 
+            }
+            else if(cipherList.getValue() == "RSA"){
+                ComboBox<Integer> temp= new ComboBox<>();
+                temp.getItems().addAll(
+                        1024,
+                        2048,
+                        4096
+                );
+                layout2.getChildren().clear();
+                layout2.getChildren().addAll(key, temp, cipherList, help);
+                encode.setOnAction(h ->{
+                    RSA rsa = new RSA(temp.getValue());
+                    BigInteger message = new BigInteger(messageInput.getText(),16);
+                    outputText = RSA.encode(message, rsa.getEncryptionKey()).toString(16);
+                    outputText += "\n\nSecret Primes: \n" + rsa.getSecretPrimes()[0].toString(16) + "\n" + rsa.getSecretPrimes()[1].toString(16);
+                    outputWindow();
+                });
+                decode.setOnAction(h ->{
+                    BigInteger message = new BigInteger(messageInput.getText(), 16);
+                    String[] primeString = key.getText().split(" ");
+                    BigInteger[] primes = new BigInteger[]{new BigInteger(primeString[0], 16), new BigInteger(primeString[1], 16)};
+
+                    RSA rsa = new RSA(primes);
+                    outputText = rsa.decode(message).toString(16);
+                  outputWindow();
+                });
             }
             else if(cipherList.getValue() == "SHA2"){
                 label.getChildren().clear();
@@ -345,7 +374,7 @@ public class Client extends Application{
                 }
                 break;
             case "MD4 Hash":
-                if(key.toUpperCase().equals("LIST")) {
+                if(key.equalsIgnoreCase("LIST")) {
                     String[] list = inputText.split("\n");
                     StringBuilder output = new StringBuilder();
                     for(String str : list) {
