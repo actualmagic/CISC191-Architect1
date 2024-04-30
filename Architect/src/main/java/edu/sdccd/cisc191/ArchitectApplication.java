@@ -1,9 +1,10 @@
 package edu.sdccd.cisc191;
 
 import edu.sdccd.cisc191.ciphers.*;
-import edu.sdccd.cisc191.hashes.MD4;
+import edu.sdccd.cisc191.database.Trigram;
 import edu.sdccd.cisc191.hashes.MD4Engine;
 import edu.sdccd.cisc191.hashes.SHA2;
+import edu.sdccd.cisc191.services.TrigramService;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,35 +14,24 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.h2.tools.Server;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-
-import java.math.BigInteger;
-import java.net.*;
-import java.io.*;
-import java.util.Arrays;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Scanner;
 
-
-/**
- * This program opens a connection to a computer specified
- * as the first command-line argument.  If no command-line
- * argument is given, it prompts the user for a computer
- * to connect to.  The connection is made to
- * the port specified by LISTENING_PORT.  The program reads one
- * line of text from the connection and then closes the
- * connection.  It displays the text that it read on
- * standard output.  This program is meant to be used with
- * the server program, DateServer, which sends the current
- * date and time on the computer where the server is running.
- */
-
-public class Client extends Application{
-    private Socket clientSocket;
-    private PrintWriter out;
-    private BufferedReader in;
+@SpringBootApplication
+public class ArchitectApplication extends Application {
+    public ConfigurableApplicationContext springContext;
     ComboBox<String> cipherList;
     private static TextArea messageInput;
     private static Stage window;
@@ -50,36 +40,13 @@ public class Client extends Application{
     private static Scene nihilistScene;
     private static String outputText;
 
-    public void startConnection(String ip, int port) throws IOException {
-        clientSocket = new Socket(ip, port);
-        out = new PrintWriter(clientSocket.getOutputStream(), true);
-        in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-    }
-
-    public CustomerResponse sendRequest() throws Exception {
-        out.println(CustomerRequest.toJSON(new CustomerRequest(1)));
-        return CustomerResponse.fromJSON(in.readLine());
-    }
-
-    public void stopConnection() throws IOException {
-        in.close();
-        out.close();
-        clientSocket.close();
-    }
     public static void main(String[] args) {
-        Client client = new Client();
-        try {
-            client.startConnection("127.0.0.1", 4444);
-            System.out.println(client.sendRequest().toString());
-            System.out.println(client.sendRequest().getId());
-            client.stopConnection();
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-        launch(args);
+        launch(ArchitectApplication.class, args);
     }
+
     @Override
-    public void start(Stage primaryStage){
+    public void start(Stage primaryStage) throws Exception {
+        TrigramService trigramService = springContext.getBean(TrigramService.class);
         window = primaryStage;
         window.setTitle("Decode");
 
@@ -97,7 +64,6 @@ public class Client extends Application{
                 "Phonetic Cipher",
                 "Nihilist Cipher",
                 "AES Cipher",
-                "RSA",
                 "RailFence Cipher",
                 "SHA2"
         );
@@ -105,39 +71,39 @@ public class Client extends Application{
         //Get Help Button
         Button help = new Button("Help");
         help.setOnAction(e -> {
-            switch (cipherList.getValue()) {
-                case "Hill Cipher":
-                    AlertBox.display("Hill Cipher", "The key must be a word or series of letters");
-                    break;
-                case "Caesar Cipher":
-                    AlertBox.display("Caesar Cipher", "The key must be a number");
-                    break;
-                case "Vigenere Cipher":
-                    AlertBox.display("Vigenere Cipher", "The key must be a word or series of letters");
-                    break;
-                case "Atbash Cipher":
-                    AlertBox.display("Atbash Cipher", "There is no key :D");
-                    break;
-                case "Affine Cipher":
-                    AlertBox.display("Affine Cipher","They key must be formatted as #,#");
-                    break;
-                case "Morse Code":
-                    AlertBox.display("Morse Code", "There is no key!");
-                    break;
-                case "Phonetic Cipher":
-                    AlertBox.display("Phonetic Cipher", "There is no key!");
-                    break;
-                case "Nihilist Cipher":
-                    AlertBox.display("Nihilist Cipher", "First entry is key for the message\n"+
-                            "Second entry is key for Polybius Square" +
-                            "\nBoth entries are words");
-                    break;
-                case "RailFence Cipher":
-                    AlertBox.display("RailFence Cipher", "The key must be a number");
-                    break;
-            }
-        }
-    );
+                    switch (cipherList.getValue()) {
+                        case "Hill Cipher":
+                            AlertBox.display("Hill Cipher", "The key must be a word or series of letters");
+                            break;
+                        case "Caesar Cipher":
+                            AlertBox.display("Caesar Cipher", "The key must be a number");
+                            break;
+                        case "Vigenere Cipher":
+                            AlertBox.display("Vigenere Cipher", "The key must be a word or series of letters");
+                            break;
+                        case "Atbash Cipher":
+                            AlertBox.display("Atbash Cipher", "There is no key :D");
+                            break;
+                        case "Affine Cipher":
+                            AlertBox.display("Affine Cipher", "They key must be formatted as #,#");
+                            break;
+                        case "Morse Code":
+                            AlertBox.display("Morse Code", "There is no key!");
+                            break;
+                        case "Phonetic Cipher":
+                            AlertBox.display("Phonetic Cipher", "There is no key!");
+                            break;
+                        case "Nihilist Cipher":
+                            AlertBox.display("Nihilist Cipher", "First entry is key for the message\n" +
+                                    "Second entry is key for Polybius Square" +
+                                    "\nBoth entries are words");
+                            break;
+                        case "RailFence Cipher":
+                            AlertBox.display("RailFence Cipher", "The key must be a number");
+                            break;
+                    }
+                }
+        );
 
         //labels
         Label keyLabel = new Label("Enter key:");
@@ -151,9 +117,9 @@ public class Client extends Application{
 
         //Decode/encode button
         Button encode = new Button("Encode");
-        encode.setOnAction(e -> Client.encode(messageInput.getText(), key.getText(), cipherList.getValue()));
+        encode.setOnAction(e -> ArchitectApplication.encode(messageInput.getText(), key.getText(), cipherList.getValue()));
         Button decode = new Button("Decode");
-        decode.setOnAction(e -> Client.decode(messageInput.getText(), key.getText(), cipherList.getValue()));
+        decode.setOnAction(e -> ArchitectApplication.decode(messageInput.getText(), key.getText(), cipherList.getValue()));
 
         //Import File Button
         Button files = new Button("Select File");
@@ -163,12 +129,12 @@ public class Client extends Application{
                     new FileChooser.ExtensionFilter("txt files", ".txt"));
             File selectedFile = fc.showOpenDialog(null);
             if (selectedFile != null) {
-                try{
+                try {
                     Scanner scanner = new Scanner(selectedFile);
-                    while(scanner.hasNextLine()){
+                    while (scanner.hasNextLine()) {
                         messageInput.appendText(scanner.nextLine());
                     }
-                }catch (FileNotFoundException f){
+                } catch (FileNotFoundException f) {
                     f.getMessage();
                 }
             } else {
@@ -203,20 +169,17 @@ public class Client extends Application{
         label.setAlignment(Pos.CENTER);
 
         cipherList.setOnAction(e -> {
-            if(Objects.equals(cipherList.getValue(), "Enigma")){
+            if (cipherList.getValue() == "Enigma") {
                 enigmaWindow();
-            }
-            else if(cipherList.getValue() == "Morse Code"){
+            } else if (cipherList.getValue() == "Morse Code") {
                 label.getChildren().clear();
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(cipherList, help);
-            }
-            else if(cipherList.getValue() == "Phonetic Cipher"){
+            } else if (cipherList.getValue() == "Phonetic Cipher") {
                 label.getChildren().clear();
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(cipherList, help);
-            }
-            else if(Objects.equals(cipherList.getValue(), "Nihilist Cipher")){
+            } else if (cipherList.getValue() == "Nihilist Cipher") {
                 TextField squareKey = new TextField();
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(key, squareKey, cipherList, help);
@@ -228,8 +191,7 @@ public class Client extends Application{
                     outputText = Nihilist.decode(messageInput.getText(), key.getText(), squareKey.getText());
                     outputWindow();
                 });
-            }
-            else if(Objects.equals(cipherList.getValue(), "AES Cipher")){
+            } else if (cipherList.getValue() == "AES Cipher") {
                 HBox comboBoxes = new HBox(10);
                 ComboBox<String> aesMode = new ComboBox<>();
                 aesMode.getItems().addAll(
@@ -244,48 +206,21 @@ public class Client extends Application{
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(key, aesMode, aesBoolean, cipherList, help);
                 encode.setOnAction(w -> {
-                    boolean flag;
+                    boolean flag = false;
                     flag = Objects.equals(aesBoolean.getValue(), "True");
                     Rijndael rijndael = new Rijndael(messageInput.getText(), key.getText(), aesMode.getValue(), flag);
                     outputText = rijndael.encode();
                     outputWindow();
                 });
                 decode.setOnAction(w -> {
-                    boolean flag;
+                    boolean flag = false;
                     flag = Objects.equals(aesBoolean.getValue(), "True");
                     Rijndael rijndael = new Rijndael(messageInput.getText(), key.getText(), aesMode.getValue(), flag);
                     outputText = rijndael.decode();
                     outputWindow();
                 });
 
-            }
-            else if(cipherList.getValue() == "RSA"){
-                ComboBox<Integer> temp= new ComboBox<>();
-                temp.getItems().addAll(
-                        1024,
-                        2048,
-                        4096
-                );
-                layout2.getChildren().clear();
-                layout2.getChildren().addAll(key, temp, cipherList, help);
-                encode.setOnAction(h ->{
-                    RSA rsa = new RSA(temp.getValue());
-                    BigInteger message = new BigInteger(messageInput.getText(),16);
-                    outputText = RSA.encode(message, rsa.getEncryptionKey()).toString(16);
-                    outputText += "\n\nSecret Primes: \n" + rsa.getSecretPrimes()[0].toString(16) + "\n" + rsa.getSecretPrimes()[1].toString(16);
-                    outputWindow();
-                });
-                decode.setOnAction(h ->{
-                    BigInteger message = new BigInteger(messageInput.getText(), 16);
-                    String[] primeString = key.getText().split(" ");
-                    BigInteger[] primes = new BigInteger[]{new BigInteger(primeString[0], 16), new BigInteger(primeString[1], 16)};
-
-                    RSA rsa = new RSA(primes);
-                    outputText = rsa.decode(message).toString(16);
-                  outputWindow();
-                });
-            }
-            else if(cipherList.getValue() == "SHA2"){
+            } else if (cipherList.getValue() == "SHA2") {
                 label.getChildren().clear();
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(cipherList, help);
@@ -294,14 +229,13 @@ public class Client extends Application{
                     outputText = sha2.runHash();
                     outputWindow();
                 });
-            }
-            else{
+            } else {
                 label.getChildren().clear();
                 label.getChildren().add(keyLabel);
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(key, cipherList, help);
-                encode.setOnAction(enc -> Client.encode(messageInput.getText(), key.getText(), cipherList.getValue()));
-                decode.setOnAction(enc -> Client.decode(messageInput.getText(), key.getText(), cipherList.getValue()));
+                encode.setOnAction(enc -> ArchitectApplication.encode(messageInput.getText(), key.getText(), cipherList.getValue()));
+                decode.setOnAction(enc -> ArchitectApplication.decode(messageInput.getText(), key.getText(), cipherList.getValue()));
             }
 //            switch(cipherList.getValue()){
 //                case "Enigma":
@@ -330,20 +264,21 @@ public class Client extends Application{
         layout.getChildren().addAll(label, layout2, layout3, messageInput, files, layout4);
 
 
-
         //shows the scene
-        mainScene = new Scene(layout, 800,600);
+        mainScene = new Scene(layout, 800, 600);
         window.setScene(mainScene);
         window.show();
     }
+
     /**
      * Encodes the message based on the cipher selected
-     * @param inputText the input message
-     * @param key the key to the cipher
+     *
+     * @param inputText  the input message
+     * @param key        the key to the cipher
      * @param cipherType the type of cipher selected
      */
     public static void encode(String inputText, String key, String cipherType) {
-        switch(cipherType) {
+        switch (cipherType) {
             case "Hill Cipher":
                 outputText = Hill.encode(inputText, key);
                 outputWindow();
@@ -365,7 +300,7 @@ public class Client extends Application{
                 outputWindow();
                 break;
             case "Affine Cipher":
-                try{
+                try {
                     outputText = Affine.encode(inputText, key);
                     outputWindow();
                     break;
@@ -374,10 +309,10 @@ public class Client extends Application{
                 }
                 break;
             case "MD4 Hash":
-                if(key.equalsIgnoreCase("LIST")) {
+                if (key.toUpperCase().equals("LIST")) {
                     String[] list = inputText.split("\n");
                     StringBuilder output = new StringBuilder();
-                    for(String str : list) {
+                    for (String str : list) {
 //                        output.append(MD4.hashAsString(str) + "\n");
                     }
 
@@ -405,13 +340,15 @@ public class Client extends Application{
                 break;
         }
     }
+
     /**
      * Decodes the message based off the cipher selected
-     * @param inputText the input message
-     * @param key the key to the cipher
+     *
+     * @param inputText  the input message
+     * @param key        the key to the cipher
      * @param cipherType the type of cipher selected
      */
-    public static void decode(String inputText, String key, String cipherType){
+    public static void decode(String inputText, String key, String cipherType) {
         switch (cipherType) {
             case "Hill Cipher":
                 outputText = Hill.decode(inputText, key);
@@ -434,11 +371,11 @@ public class Client extends Application{
                 outputWindow();
                 break;
             case "Affine Cipher":
-                try{
+                try {
                     outputText = Affine.decode(inputText, key);
                     outputWindow();
                     break;
-                } catch(Exception e){
+                } catch (Exception e) {
                     AlertBox.display("Error", "ERROR!\nInput must be #,#\nThe first number must not be even or a multiple of 13");
                 }
                 break;
@@ -455,7 +392,7 @@ public class Client extends Application{
 
 //                HashMap<String, String> crackedPasswords = md4Engine.getCrackedPasswords();
                 StringBuilder output = new StringBuilder();
-                for(String str : list) {
+                for (String str : list) {
 //                    output.append(str).append(" --> ").append(crackedPasswords.get(str)).append("\n");
                 }
                 outputText = output.toString();
@@ -478,6 +415,7 @@ public class Client extends Application{
                 break;
         }
     }
+
     /**
      * Displays output window
      * Back button will switch back to mainScene
@@ -488,13 +426,14 @@ public class Client extends Application{
 
     /**
      * Displays output window
+     *
      * @param scene the scene the back button will go to
      */
     private static void createSecondWindow(Scene scene) {
         Label result = new Label("Result:"); //re
         TextArea output = new TextArea(outputText);
         output.setWrapText(true);
-        output.setPrefSize(300,200);
+        output.setPrefSize(300, 200);
 
         //back button to change scene to previous scene
         Button back = new Button("Back");
@@ -518,19 +457,21 @@ public class Client extends Application{
 
         //final layout for all layouts in scene
         VBox layout4 = new VBox(10);
-        layout4.setPadding(new Insets(50,50,50,50));
+        layout4.setPadding(new Insets(50, 50, 50, 50));
         layout4.setAlignment(Pos.CENTER);
         layout4.getChildren().addAll(result, output, view);
         Scene outputScene = new Scene(layout4, 800, 600);
         window.setScene(outputScene);
     }
+
     /**
      * Displays output window
      * Back button will switch back to enigmaScene
      */
-    public static void enigmaOutputWindow(){
+    public static void enigmaOutputWindow() {
         createSecondWindow(enigmaScene);
     }
+
     /**
      * Download outputText using FileChooser
      */
@@ -554,7 +495,7 @@ public class Client extends Application{
     /**
      * Creates a window for enigma cipher
      */
-    public static void enigmaWindow(){
+    public static void enigmaWindow() {
         HBox layout2 = new HBox(20);
         layout2.setAlignment(Pos.CENTER);
 
@@ -682,9 +623,9 @@ public class Client extends Application{
         back.setOnAction(e -> window.setScene(mainScene));
         Button encode = new Button("Encode");
         encode.setOnAction(e -> {
-        Enigma enigma = new Enigma(new int[]{CipherTools.romanToInteger(rotor.getValue()),Integer.parseInt(positionInput.getText()),Integer.parseInt(ringInput.getText())},
-                    new int[]{CipherTools.romanToInteger(rotor2.getValue()),Integer.parseInt(positionInput2.getText()),Integer.parseInt(ringInput2.getText())},
-                    new int[]{CipherTools.romanToInteger(rotor3.getValue()),Integer.parseInt(positionInput3.getText()),Integer.parseInt(ringInput3.getText())}, reflector.getValue(), plugboardInput.getText());
+            Enigma enigma = new Enigma(new int[]{CipherTools.romanToInteger(rotor.getValue()), Integer.parseInt(positionInput.getText()), Integer.parseInt(ringInput.getText())},
+                    new int[]{CipherTools.romanToInteger(rotor2.getValue()), Integer.parseInt(positionInput2.getText()), Integer.parseInt(ringInput2.getText())},
+                    new int[]{CipherTools.romanToInteger(rotor3.getValue()), Integer.parseInt(positionInput3.getText()), Integer.parseInt(ringInput3.getText())}, reflector.getValue(), plugboardInput.getText());
             outputText = enigma.encode(inputText.getText().toUpperCase().replaceAll("[^A-Z]", ""));
             enigmaOutputWindow();
         });
@@ -704,7 +645,7 @@ public class Client extends Application{
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(20, 20, 20, 20));
         layout.setAlignment(Pos.CENTER);
-        layout.getChildren().addAll(layout2, layout4, layout5, layout6, layout8, inputText, layout9, layout7 );
+        layout.getChildren().addAll(layout2, layout4, layout5, layout6, layout8, inputText, layout9, layout7);
 
         //shows scene
         enigmaScene = new Scene(layout, 800, 600);
@@ -720,12 +661,70 @@ public class Client extends Application{
      * @param input URL inputted by user
      * @return Text from the URL
      *************************************************************************/
-    public static String getUrl(String input){
+    public static String getUrl(String input) {
         try {
             Document document = Jsoup.connect(input).get();
             return document.text();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
     }
-} //end class Client
+
+    @Override
+    public void init() throws Exception {
+        springContext = SpringApplication.run(ArchitectApplication.class);
+        TrigramService trigramService = springContext.getBean(TrigramService.class);
+
+        Trigram the = new Trigram(1, "the");
+        trigramService.save(the);
+        Trigram and = new Trigram(2, "and");
+        trigramService.save(and);
+        Trigram ing = new Trigram(3, "ing");
+        trigramService.save(ing);
+        Trigram her = new Trigram(4, "her");
+        trigramService.save(her);
+        Trigram hat = new Trigram(5, "hat");
+        trigramService.save(hat);
+        Trigram his = new Trigram(6, "his");
+        trigramService.save(his);
+        Trigram tha = new Trigram(7, "tha");
+        trigramService.save(tha);
+        Trigram ere = new Trigram(8, "ere");
+        trigramService.save(ere);
+        Trigram foR = new Trigram(9, "for");
+        trigramService.save(foR);
+        Trigram ent = new Trigram(10, "ent");
+        trigramService.save(ent);
+        Trigram ion = new Trigram(11, "ion");
+        trigramService.save(ion);
+        Trigram ter = new Trigram(12, "ter");
+        trigramService.save(ter);
+        Trigram was = new Trigram(13, "was");
+        trigramService.save(was);
+        Trigram you = new Trigram(14, "you");
+        trigramService.save(you);
+        Trigram ith = new Trigram(15, "ith");
+        trigramService.save(ith);
+        Trigram ver = new Trigram(16, "ver");
+        trigramService.save(ver);
+        Trigram all = new Trigram(17, "all");
+        trigramService.save(all);
+        Trigram wit = new Trigram(18, "wit");
+        trigramService.save(wit);
+        Trigram thi = new Trigram(19, "thi");
+        trigramService.save(thi);
+        Trigram tio = new Trigram(20, "tio");
+        trigramService.save(tio);
+
+    }
+
+    @Override
+    public void stop() throws Exception {
+        springContext.stop();
+    }
+
+    public Server inMemoryDBServer() throws SQLException {
+        return Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "9092");
+    }
+}
