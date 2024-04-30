@@ -9,9 +9,11 @@ import jakarta.persistence.Table;
 @Table
 public class Trigram {
     @Id
-    @Column(name="most_common")
+    @Column(name = "most_common")
     private long id;
-    @Column(name="combinations")
+    @Column(name = "combinations",
+            nullable = false,
+            columnDefinition = "TEXT")
     private String letters;
 
     public Trigram(long id, String letters) {
