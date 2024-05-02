@@ -1,5 +1,7 @@
 package edu.sdccd.cisc191;
 
+import java.sql.*;
+
 /**************************************************************************
  * Set of utilities to be used across all the ciphers
  * @author Oliver Tran
@@ -109,5 +111,23 @@ public class CipherTools {
                 break;
         }
         return integer;
+    }
+
+    public static double trigramScore(String input) throws SQLException {
+        double totalFrequency = 0;
+        String SQL_SELECT = "SELECT * FROM TRIGRAM";
+        Connection conn = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mem:trigram", "h2", "h2");
+        PreparedStatement preparedStatement = conn.prepareStatement(SQL_SELECT);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
+            String trigram = resultSet.getString("COMBINATIONS");
+            for (int i = 0; i < input.length() - 3; i++) {
+                if (trigram.equals(input.substring(i, i + 3))) {
+                    double frequency = resultSet.getDouble("FREQUENCIES");
+                    totalFrequency += frequency;
+                }
+            }
+        }
+        return totalFrequency;
     }
 }
