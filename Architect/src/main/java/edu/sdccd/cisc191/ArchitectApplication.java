@@ -725,7 +725,8 @@ public class ArchitectApplication extends Application {
     public void stop() throws Exception {
         springContext.stop();
     }
-@Bean(initMethod =  "start", destroyMethod = "stop")
+
+    @Bean(initMethod = "start", destroyMethod = "stop")
     public Server inMemoryDBServer() throws SQLException {
         return Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "9092");
     }
