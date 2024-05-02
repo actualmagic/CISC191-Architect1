@@ -51,7 +51,6 @@ public class Trigram {
     public void setFrequency(double frequency) {
         this.frequency = frequency;
     }
-
     @Override
     public String toString() {
         return "Trigram{" +
