@@ -15,10 +15,13 @@ public class Trigram {
             nullable = false,
             columnDefinition = "TEXT")
     private String letters;
+    @Column(name = "frequencies")
+    private double frequency;
 
-    public Trigram(long id, String letters) {
+    public Trigram(long id, String letters, double frequency) {
         this.id = id;
         this.letters = letters;
+        this.frequency = frequency;
     }
 
     public Trigram() {
@@ -39,6 +42,14 @@ public class Trigram {
 
     public void setLetters(String letters) {
         this.letters = letters;
+    }
+
+    public double getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(double frequency) {
+        this.frequency = frequency;
     }
 
     @Override
