@@ -14,11 +14,14 @@ public class Trigram {
     @Column(name = "combinations",
             nullable = false,
             columnDefinition = "TEXT")
-    private String letters;
+    private String trigrams;
+    @Column(name = "frequencies")
+    private double frequency;
 
-    public Trigram(long id, String letters) {
+    public Trigram(long id, String trigrams, double frequency) {
         this.id = id;
-        this.letters = letters;
+        this.trigrams = trigrams;
+        this.frequency = frequency;
     }
 
     public Trigram() {
@@ -33,19 +36,28 @@ public class Trigram {
         this.id = id;
     }
 
-    public String getLetters() {
-        return letters;
+    public String getTrigrams() {
+        return trigrams;
     }
 
-    public void setLetters(String letters) {
-        this.letters = letters;
+    public void setTrigrams(String letters) {
+        this.trigrams = letters;
+    }
+
+    public double getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(double frequency) {
+        this.frequency = frequency;
     }
 
     @Override
     public String toString() {
         return "Trigram{" +
                 "id=" + id +
-                ", letters='" + letters + '\'' +
+                ", trigrams='" + trigrams + '\'' +
+                ", frequency=" + frequency +
                 '}';
     }
 }
