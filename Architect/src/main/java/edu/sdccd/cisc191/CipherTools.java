@@ -114,6 +114,7 @@ public class CipherTools {
     }
 
     public static double trigramScore(String input) throws SQLException {
+        input = input.toLowerCase();
         double totalFrequency = 0;
         String SQL_SELECT = "SELECT * FROM TRIGRAM";
         Connection conn = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mem:trigram", "h2", "h2");
