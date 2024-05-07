@@ -6,50 +6,71 @@ import java.util.Arrays;
 public class SHA3 {
     private boolean [][][] state;
     private byte[] inputBytes;
-    private boolean[] inputBits;
-    private int width;
+    private int d;
     private int r;
+    private static final int B = 1600;
+    private static final int width = B/25;
+    private static final int NR = 24;
+    private String type;
 
-    public SHA3 (String input, int b, int c, int d) {
+    public SHA3 (String input, int c, int d, String type) {
         inputBytes = input.getBytes(StandardCharsets.UTF_8);
-        inputBits = new boolean[b];
-        width = b/25;
-        r = 1600 - c;
+        this.r = B-c;
+        this.d = d;
+        this.type = type;
 
-        state = new boolean[5][5][width];
+        pad();
 
-        //Converts to bits
-        for(int i=0; i<inputBytes.length; i++) {
-            for(int j=0; j<8; j++) {
-                byte temp = (byte) ((byte) (inputBytes[i] <<j) >>> 7);
-                inputBits[8*i+j] = temp != 0;
-            }
+        System.out.println(sponge());
+    }
+
+    public String sponge() {
+        int n = inputBytes.length/r;
+        int c = B-r;
+        boolean[][] p = new boolean[(inputBytes.length*8)/r][B];
+
+        for(int i=0; i<inputBytes.length; i+=r/8)
+            p[i/(r/8)] = bytesToBits(Arrays.copyOfRange(inputBytes, i, i+r/8));
+
+        boolean[] s = new boolean[B];
+
+        for(int i=0; i<p.length; i++) {
+            for(int j=0; j<r; j++)
+                s[j] = Boolean.logicalXor(s[j], p[i][j]);
+            for(int j=r; j<B; j++)
+                s[j] = Boolean.logicalXor(s[j], false);
+            keccakp(s);
+            s = readState(s.length);
         }
 
-        inputBits = Arrays.copyOf(inputBits, inputBits.length + r - (input.length()*8)%r - 1);
-        inputBits[input.length()*8] = true;
-        inputBits[inputBits.length-1] = true;
+        StringBuilder output = new StringBuilder();
+
+        while(output.length() < d) {
+            byte[] outBytes = bitsToBytes(readState(r));
+            for (byte b : outBytes)
+                output.append(String.format("%02x", b));
+
+            keccakp(s);
+        }
+
+        output.setLength(d/4);
+        return output.toString();
     }
 
-    public void sponge() {
-        int n = inputBytes.length/r;
-        boolean[] s = new boolean[width];
-        keccak(inputBits, 24);
-
-    }
-
-    private void keccak(boolean[] s, int numRounds) {
+    private void keccakp(boolean[] s) {
         createState(s);
 
-        for(int i = (int) (12 + 2*Math.log(width) - numRounds); i<12 + 2*Math.log(width) - 1; i++) {
+//        byte[] temp;
+
+        for(int i = (int) (12 + 2*(Math.log(width)/Math.log(2)) - NR); i<12 + 2*(Math.log(width)/Math.log(2)) - 1; i++) {
+//            temp = bitsToBytes(readState(s.length));
             theta();
+//            temp = bitsToBytes(readState(s.length));
             rho();
             pi();
             chi();
             iota(i);
         }
-
-
     }
 
     private void theta() {
@@ -85,7 +106,7 @@ public class SHA3 {
 
         for(int t=0; t<23; t++) {
             for(int z=0; z<width; z++) {
-                a[x][y][z] = state[x][y][(z-(t+1)*(t+2)/2)%width];
+                a[x][y][z] = state[x][y][(width*5 + z-(t+1)*(t+2)/2)%width];
                 int tempX = y;
                 y = (2*x + 3*y)%5;
                 x = tempX;
@@ -129,7 +150,7 @@ public class SHA3 {
 
         boolean[] rc = new boolean[width];
 
-        for(int j=0; j<Math.log(width); j++)
+        for(int j=0; j<Math.log(width)/Math.log(2); j++)
             rc[(int) (Math.pow(2, j) - 1)] = rc(j + 7*round);
         for(int z=0; z < width; z++) {
             a[0][0][z] = Boolean.logicalXor(a[0][0][z], rc(z));
@@ -156,11 +177,52 @@ public class SHA3 {
     }
 
     private void createState(boolean[] s) {
+        state = new boolean[5][5][B/25];
+
         for(int y=0; y<5; y++) {
             for(int x=0; x<5; x++) {
                 for(int z=0; z<width; z++)
                     state[x][y][z] = s[width*(5*y+x)+z];
             }
         }
+    }
+
+    private boolean[] readState(int trunc) {
+        boolean[] ret = new boolean[trunc];
+        for(int i=0; i<ret.length; i++)
+            ret[i] = state[(i/64)%5][i/320][i%64];
+        return ret;
+    }
+
+    private boolean[] bytesToBits(byte[] inputBytes) {
+        boolean[] inputBits = new boolean[inputBytes.length*8];
+        for(int i=0; i<inputBytes.length; i++) {
+            for(int j=0; j<8; j++) {
+                byte temp = (byte) ((byte) (inputBytes[i] <<j) >>> 7);
+                inputBits[8*i+j] = temp != 0;
+            }
+        }
+        return inputBits;
+    }
+
+    private byte[] bitsToBytes(boolean[] inputBits) {
+        byte[] ret = new byte[inputBits.length/8];
+        for(int i=0; i<ret.length; i++) {
+            for(int j=0; j<8; j++) {
+                if(inputBits[i*8+j])
+                    ret[i] += (byte) Math.pow(2, 7-j);
+            }
+        }
+        return ret;
+    }
+
+    public void pad() {
+        inputBytes = Arrays.copyOf(inputBytes, inputBytes.length + 1);
+        inputBytes[inputBytes.length-1] = (byte) 0x60;
+        inputBytes = Arrays.copyOf(inputBytes, inputBytes.length + (r/8) - (inputBytes.length-1)%(r/8) - 1);
+        if(inputBytes[inputBytes.length-1] == (byte) 0x60)
+            inputBytes[inputBytes.length-1] = (byte) 0x61;
+        else
+            inputBytes[inputBytes.length-1] = (byte) 0x01;
     }
 }
