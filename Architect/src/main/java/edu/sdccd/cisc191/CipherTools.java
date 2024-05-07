@@ -122,7 +122,7 @@ public class CipherTools {
         ResultSet resultSet = preparedStatement.executeQuery();
         while (resultSet.next()) {
             String trigram = resultSet.getString("COMBINATIONS");
-            for (int i = 0; i < input.length() - 3; i++) {
+            for (int i = 0; i <= input.length() - 3; i++) {
                 if (trigram.equals(input.substring(i, i + 3))) {
                     double frequency = resultSet.getDouble("FREQUENCIES");
                     totalFrequency += frequency;
