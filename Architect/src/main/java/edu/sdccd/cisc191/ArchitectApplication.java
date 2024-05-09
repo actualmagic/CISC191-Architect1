@@ -171,17 +171,21 @@ public class ArchitectApplication extends Application {
         label.setAlignment(Pos.CENTER);
 
         cipherList.setOnAction(e -> {
-            if (cipherList.getValue() == "Enigma") {
+            if (cipherList.getValue().equals("Enigma")) {
                 enigmaWindow();
-            } else if (cipherList.getValue() == "Morse Code") {
+            } else if (cipherList.getValue().equals("Morse Code")) {
                 label.getChildren().clear();
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(cipherList, help);
-            } else if (cipherList.getValue() == "Phonetic Cipher") {
+            } else if (cipherList.getValue().equals("Phonetic Cipher")) {
                 label.getChildren().clear();
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(cipherList, help);
-            } else if (cipherList.getValue() == "Nihilist Cipher") {
+            } else if(cipherList.getValue().equals("Atbash Cipher")){
+                label.getChildren().clear();
+                layout2.getChildren().clear();
+                layout2.getChildren().addAll(cipherList, help);
+            } else if (cipherList.getValue().equals("Nihilist Cipher")) {
                 TextField squareKey = new TextField();
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(key, squareKey, cipherList, help);
@@ -193,8 +197,7 @@ public class ArchitectApplication extends Application {
                     outputText = Nihilist.decode(messageInput.getText(), key.getText(), squareKey.getText());
                     outputWindow();
                 });
-            } else if (cipherList.getValue() == "AES Cipher") {
-                HBox comboBoxes = new HBox(10);
+            } else if (cipherList.getValue().equals("AES Cipher")) {
                 ComboBox<String> aesMode = new ComboBox<>();
                 aesMode.getItems().addAll(
                         "ECB",
@@ -222,7 +225,7 @@ public class ArchitectApplication extends Application {
                     outputWindow();
                 });
 
-            } else if (cipherList.getValue() == "SHA2") {
+            } else if (cipherList.getValue().equals("SHA2")) {
                 label.getChildren().clear();
                 layout2.getChildren().clear();
                 layout2.getChildren().addAll(cipherList, help);
@@ -407,6 +410,7 @@ public class ArchitectApplication extends Application {
             case "Phonetic Cipher":
                 outputText = Phonetic.printPhoneticDecoded(inputText);
                 outputWindow();
+                break;
             case "RailFence Cipher":
                 try {
                     outputText = RailFence.decode(inputText, key);
