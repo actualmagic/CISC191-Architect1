@@ -2,6 +2,7 @@ package edu.sdccd.cisc191;
 
 import com.aparapi.Kernel;
 import com.aparapi.Range;
+import edu.sdccd.cisc191.hashes.MD4;
 import edu.sdccd.cisc191.hashes.MD4Engine;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -122,7 +123,7 @@ public class MD4Test {
                 "The Modules page will be the home page as the course is organized around that. The first module will be stickied, as it will contain information you will need throughout the course and weeks will be sorted in descending order with the active week on top.\n" +
                 "\n" +
                 "Be sure to stay active in Canvas. If you are unable, please let me know ahead of time, or drop the course. I am required by the school to drop students who are inactive. There is a waiting list of students happy to take your spot.";
-        //assertEquals("c185837692aad6c2ae9a6a51dcfa2dc2", MD4.hashAsString(inputText));
+        assertEquals("c185837692aad6c2ae9a6a51dcfa2dc2", MD4.runDigest(inputText));
     }
 
     @Test

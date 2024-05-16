@@ -4,11 +4,11 @@ public class MD4{
     private static final int[] ROUND2 = {0,4,8,12,1,5,9,13,2,6,10,14,3,7,11,15};
     private static final int[] ROUND3 = {0,8,4,12,2,10,6,14,1,9,5,13,3,11,7,15};
 
-    public static byte[] runDigest(char[] inputText) {
+    public static String runDigest(String inputText) {
         final int[] buffer = {0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476};
 
         //Determines how much padding is required to make the length divisible by 512 bits
-        long textLength = inputText.length;
+        long textLength = inputText.length();
         long paddingLength = textLength%64;
         if(paddingLength < 56)
             paddingLength = 56-paddingLength;
@@ -18,7 +18,7 @@ public class MD4{
         byte[] messageBytes = new byte[(int) (textLength + paddingLength + 8)];
 
         for(int i=0; i<textLength; i++) {
-            messageBytes[i] = (byte) inputText[i];
+            messageBytes[i] = (byte) inputText.charAt(i);
         }
 
         messageBytes[(int) textLength] = (byte) 0x80; //Sets next byte to '10000000'
@@ -63,14 +63,18 @@ public class MD4{
             buffer[3] += d;
         }
 
-        //Store result of buffers as a byte[]
-        byte[] ret = new byte[16];
+        byte[] bufferBytes = new byte[16];
         for( int i=0; i<4; i++ ) {
             for ( int j=0; j<4; j++ ) {
-                ret[4*i + j] = (byte) (buffer[i] >>> (8*j));
+                bufferBytes[4*i + j] = (byte) (buffer[i] >>> (8*j));
             }
         }
-        return ret;
+
+        StringBuilder sb = new StringBuilder();
+        for(byte b : bufferBytes)
+            sb.append(String.format("%02x", b & 0xff));
+
+        return sb.toString();
     }
 
     private static int f (int x, int y, int z) {

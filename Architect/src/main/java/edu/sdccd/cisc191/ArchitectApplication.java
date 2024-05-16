@@ -3,6 +3,7 @@ package edu.sdccd.cisc191;
 import edu.sdccd.cisc191.ciphers.*;
 import edu.sdccd.cisc191.database.Trigram;
 import edu.sdccd.cisc191.hashes.MD4Engine;
+import edu.sdccd.cisc191.hashes.MD4;
 import edu.sdccd.cisc191.hashes.SHA2;
 import edu.sdccd.cisc191.services.TrigramService;
 import javafx.application.Application;
@@ -301,16 +302,16 @@ public class ArchitectApplication extends Application {
                 }
                 break;
             case "MD4 Hash":
-                if (key.toUpperCase().equals("LIST")) {
+                if (key.equalsIgnoreCase("LIST")) {
                     String[] list = inputText.split("\n");
                     StringBuilder output = new StringBuilder();
                     for (String str : list) {
-//                        output.append(MD4.hashAsString(str) + "\n");
+                        output.append(MD4.runDigest(str) + "\n");
                     }
 
                     outputText = output.toString();
                 } else {
-//                    outputText = MD4.hashAsString(inputText);
+                    outputText = MD4.runDigest(inputText);
                 }
                 outputWindow();
                 break;
@@ -373,7 +374,6 @@ public class ArchitectApplication extends Application {
                 break;
             case "MD4 Hash":
                 String[] list = inputText.split("\n");
-                int numThreads = 8; //TODO Get Number of Threads
                 HashMap<Character, char[]> formatMap = new HashMap<>(); //TODO: Get this as user input
                 formatMap.put('a', new char[]{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'});
                 formatMap.put('A', new char[]{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'});
@@ -382,10 +382,10 @@ public class ArchitectApplication extends Application {
                 MD4Engine md4Engine = new MD4Engine(list, formatMap, key);
                 md4Engine.runMD4Crack();
 
-//                HashMap<String, String> crackedPasswords = md4Engine.getCrackedPasswords();
+                HashMap<String, String> crackedPasswords = md4Engine.getCrackedPasswords();
                 StringBuilder output = new StringBuilder();
                 for (String str : list) {
-//                    output.append(str).append(" --> ").append(crackedPasswords.get(str)).append("\n");
+                    output.append(str).append(" --> ").append(crackedPasswords.get(str)).append("\n");
                 }
                 outputText = output.toString();
                 outputWindow();
