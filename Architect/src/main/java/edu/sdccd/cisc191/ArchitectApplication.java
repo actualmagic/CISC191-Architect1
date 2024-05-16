@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Objects;
@@ -67,7 +68,8 @@ public class ArchitectApplication extends Application {
                 "Nihilist Cipher",
                 "AES Cipher",
                 "RailFence Cipher",
-                "SHA2"
+                "SHA2",
+                "RSA"
         );
 
         //Get Help Button
@@ -103,6 +105,26 @@ public class ArchitectApplication extends Application {
                         case "RailFence Cipher":
                             AlertBox.display("RailFence Cipher", "The key must be a number");
                             break;
+                        case "MD4 Hash":
+                            AlertBox.display("MD4 Hash", "When encrypting multiple messages, " +
+                                    "enter 'LIST' to individually hash each row\n" +
+                                    "When 'decoding' create a mask using\n" +
+                                    "'a' to represent the lowercase alphabet\n" +
+                                    "'A' to represent the uppercase alphabet\n" +
+                                    "'0' to represent numbers 0-9");
+                            break;
+                        case "AES Cipher":
+                            AlertBox.display("AES Cipher", "ECB: The key must be a 128-bit Hexadecimal string\n" +
+                                    "CTR: The 128-bit key must be appended with a 128-bit IV\n" +
+                                    "Second entry: Mode of Operation\n" +
+                                    "Third Entry: Indicate whether the plaintext text is in UTF-8 or Hexadecimal");
+                            break;
+                        case "SHA2":
+                            AlertBox.display("SHA2", "No key is required since SHA2 is a hash function");
+                            break;
+                            case "RSA":
+                            AlertBox.display("RSA", "RSA is asymmetrical. An encryption key will be generated automatically\n" +
+                                    "The decryption key will be the pair of primes created during encryption");
                     }
                 }
         );
@@ -233,6 +255,40 @@ public class ArchitectApplication extends Application {
                     SHA2 sha2 = new SHA2(messageInput.getText());
                     outputText = sha2.runHash();
                     outputWindow();
+                });
+            } else if(cipherList.getValue() == "RSA"){
+                ComboBox<Integer> temp= new ComboBox<>();
+                temp.getItems().addAll(
+                        1024,
+                        2048,
+                        4096
+                );
+                layout2.getChildren().clear();
+                layout2.getChildren().addAll(key, temp, cipherList, help);
+                encode.setOnAction(h ->{
+                    try{
+                        RSA rsa = new RSA(temp.getValue());
+                        BigInteger message = new BigInteger(messageInput.getText(),16);
+                        outputText = RSA.encode(message, rsa.getEncryptionKey()).toString(16);
+                        outputText += "\n\nSecret Primes: \n" + rsa.getSecretPrimes()[0].toString(16) + "\n" + rsa.getSecretPrimes()[1].toString(16);
+                        outputWindow();
+                    } catch (Exception ex) {
+                        AlertBox.display("ERROR", "See HELP for help");
+                    }
+                });
+                decode.setOnAction(h ->{
+                    try{
+                        BigInteger message = new BigInteger(messageInput.getText(), 16);
+                        String[] primeString = key.getText().split(" ");
+                        BigInteger[] primes = new BigInteger[]{new BigInteger(primeString[0], 16), new BigInteger(primeString[1], 16)};
+
+                        RSA rsa = new RSA(primes);
+                        outputText = rsa.decode(message).toString(16);
+                        outputWindow();
+                    } catch (Exception ex) {
+                        AlertBox.display("ERROR", "See HELP for help");
+                    }
+
                 });
             } else {
                 label.getChildren().clear();
@@ -616,11 +672,17 @@ public class ArchitectApplication extends Application {
         back.setOnAction(e -> window.setScene(mainScene));
         Button encode = new Button("Encode");
         encode.setOnAction(e -> {
-            Enigma enigma = new Enigma(new int[]{CipherTools.romanToInteger(rotor.getValue()), Integer.parseInt(positionInput.getText()), Integer.parseInt(ringInput.getText())},
-                    new int[]{CipherTools.romanToInteger(rotor2.getValue()), Integer.parseInt(positionInput2.getText()), Integer.parseInt(ringInput2.getText())},
-                    new int[]{CipherTools.romanToInteger(rotor3.getValue()), Integer.parseInt(positionInput3.getText()), Integer.parseInt(ringInput3.getText())}, reflector.getValue(), plugboardInput.getText());
-            outputText = enigma.encode(inputText.getText().toUpperCase().replaceAll("[^A-Z]", ""));
-            enigmaOutputWindow();
+           try{
+               Enigma enigma = new Enigma(new int[]{CipherTools.romanToInteger(rotor.getValue()), Integer.parseInt(positionInput.getText()), Integer.parseInt(ringInput.getText())},
+                       new int[]{CipherTools.romanToInteger(rotor2.getValue()), Integer.parseInt(positionInput2.getText()), Integer.parseInt(ringInput2.getText())},
+                       new int[]{CipherTools.romanToInteger(rotor3.getValue()), Integer.parseInt(positionInput3.getText()), Integer.parseInt(ringInput3.getText())}, reflector.getValue(), plugboardInput.getText());
+               outputText = enigma.encode(inputText.getText().toUpperCase().replaceAll("[^A-Z]", ""));
+               enigmaOutputWindow();
+           } catch (Exception ex) {
+               AlertBox.display("ERROR", "Inputs are wrong \n" +
+                       "See HELP for help");
+           }
+
         });
         Button decode = new Button("Cryptanalyze");
         decode.setOnAction(e -> {
@@ -706,6 +768,46 @@ public class ArchitectApplication extends Application {
         trigramService.save(his);
         Trigram oft = new Trigram(20, "oft", 0.24);
         trigramService.save(oft);
+        Trigram hes = new Trigram(21, "hes", 0.24);
+        trigramService.save(hes);
+        Trigram ith = new Trigram(22, "ith", 0.24);
+        trigramService.save(ith);
+        Trigram ers = new Trigram(23, "ers", 0.24);
+        trigramService.save(ers);
+        Trigram ati = new Trigram(24, "ati", 0.24);
+        trigramService.save(ati);
+        Trigram oth = new Trigram(25, "oth", 0.23);
+        trigramService.save(oth);
+        Trigram fth = new Trigram(26, "fth", 0.23);
+        trigramService.save(fth);
+        Trigram dth = new Trigram(27, "dth", 0.23);
+        trigramService.save(dth);
+        Trigram ver = new Trigram(28, "ver", 0.22);
+        trigramService.save(ver);
+        Trigram tth = new Trigram(29, "tth", 0.22);
+        trigramService.save(tth);
+        Trigram thi = new Trigram(30, "thi", 0.22);
+        trigramService.save(thi);
+        Trigram rea = new Trigram(31, "rea", 0.21);
+        trigramService.save(rea);
+        Trigram san = new Trigram(32, "san", 0.21);
+        trigramService.save(san);
+        Trigram wit = new Trigram(33, "wit", 0.21);
+        trigramService.save(wit);
+        Trigram ate = new Trigram(34, "ate", 0.2);
+        trigramService.save(ate);
+        Trigram are = new Trigram(35, "are", 0.2);
+        trigramService.save(are);
+        Trigram ear = new Trigram(36, "ear", 0.19);
+        trigramService.save(ear);
+        Trigram res = new Trigram(37, "res", 0.19);
+        trigramService.save(res);
+        Trigram ont = new Trigram(38, "ont", 0.18);
+        trigramService.save(ont);
+        Trigram tin = new Trigram(39, "tin", 0.18);
+        trigramService.save(tin);
+        Trigram ess = new Trigram(40, "ess", 0.18);
+        trigramService.save(ess);
     }
     /**************************************************************************
      * stop database
