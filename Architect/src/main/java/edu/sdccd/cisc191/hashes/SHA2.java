@@ -1,5 +1,8 @@
 package edu.sdccd.cisc191.hashes;
 
+/**************************************************************************
+ * SHA2-256 Hash function
+ *************************************************************************/
 public class SHA2 {
     private static final int[] INIT_HASH = {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
     private static final int[] HASH_CONST = {
@@ -18,6 +21,10 @@ public class SHA2 {
     private int t1, t2;
     private final int[] wVar;
 
+    /**************************************************************************
+     * Constructor to create SHA2 object
+     * @param inputText The message to hash
+     *************************************************************************/
     public SHA2(String inputText) {
         schedule = new int[64];
         t1=0;
@@ -56,6 +63,10 @@ public class SHA2 {
         }
     }
 
+    /**************************************************************************
+     * Runs the hash using the input from the constructor
+     * @return The 256-bit hash of the input
+     *************************************************************************/
     public String runHash () {
         int[] hash = new int[8];
         System.arraycopy(INIT_HASH, 0, hash, 0, 8);

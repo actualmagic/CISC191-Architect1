@@ -1,7 +1,17 @@
 package edu.sdccd.cisc191.ciphers;
 
+/**************************************************************************
+ * Railfence Cipher encryption, decryption and cryptanalysis
+ * @author Robert Custon
+ *************************************************************************/
 public class RailFence {
 
+    /**************************************************************************
+     * Encrypts plain text using a Rail Fence Cipher given a key word
+     * @param message Plaintext to encrypt
+     * @param height Height to construct the ciphertext with
+     * @return The encrypted ciphertext
+     *************************************************************************/
     public static String encode(String message, String height) {
         int matrixHeight = Integer.parseInt(height);
         char[][] railMatrix = new char[matrixHeight][message.length()];
@@ -45,6 +55,12 @@ public class RailFence {
         encodeRecursive(railMatrix, message, row, col, matrixHeight, downward);
     }
 
+    /**************************************************************************
+     * Decodes cipher text using a Rail Fence cipher
+     * @param encodedMessage The cipher text
+     * @param height The height the cipher text was constructed with
+     * @return The decrypted cipher text
+     *************************************************************************/
     public static String decode(String encodedMessage, String height) {
         int matrixHeight = Integer.parseInt(height);
         char[][] railMatrix = new char[matrixHeight][encodedMessage.length()];

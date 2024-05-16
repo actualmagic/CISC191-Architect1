@@ -2,6 +2,9 @@ package edu.sdccd.cisc191.ciphers;
 
 import java.util.Arrays;
 
+/**************************************************************************
+ * AES-128 Encryption and Decryption
+ *************************************************************************/
 public class Rijndael {
     private static final byte[] S_BOX = {
             0x63, 0x7C, 0x77, 0x7B, (byte)0xF2, 0x6B, 0x6F, (byte)0xC5, 0x30, 0x01, 0x67, 0x2B, (byte)0xFE, (byte)0xD7, (byte)0xAB, 0x76,
@@ -178,6 +181,13 @@ public class Rijndael {
     private String mode;
     private long[] initVector = new long[2];
 
+    /**************************************************************************
+     * Constructor to create AES-128 object
+     * @param inputText Plain text to be encrypted
+     * @param cipherKey 128-Bit key
+     * @param mode Which mode of operation to use (ECB, CTR, etc.)
+     * @param isHex Boolean flag to indicate if cipher text is a hexadecimal value
+     *************************************************************************/
     public Rijndael(String inputText, String cipherKey, String mode, boolean isHex) {
         if(!isHex) {
             StringBuilder sb = new StringBuilder();
@@ -218,6 +228,10 @@ public class Rijndael {
         }
     }
 
+    /**************************************************************************
+     * Encrypts the message using AES-128
+     * @return The encrypted plain text
+     *************************************************************************/
     public String encode() {
         StringBuilder output = new StringBuilder();
 
@@ -257,6 +271,10 @@ public class Rijndael {
         return "";
     }
 
+    /**************************************************************************
+     * Decrypts the message using AES-128
+     * @return The decrypted cipher text
+     *************************************************************************/
     public String decode() {
         StringBuilder output = new StringBuilder();
 

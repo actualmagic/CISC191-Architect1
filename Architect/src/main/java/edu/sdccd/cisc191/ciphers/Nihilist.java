@@ -2,6 +2,10 @@ package edu.sdccd.cisc191.ciphers;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+/**************************************************************************
+ * Nihilist Cipher
+ * @author Vinh Tong
+ *************************************************************************/
 
 public class Nihilist {
     /**************************************************************************
