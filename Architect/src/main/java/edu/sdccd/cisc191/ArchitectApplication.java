@@ -242,19 +242,6 @@ public class ArchitectApplication extends Application {
                 encode.setOnAction(enc -> ArchitectApplication.encode(messageInput.getText(), key.getText(), cipherList.getValue()));
                 decode.setOnAction(enc -> ArchitectApplication.decode(messageInput.getText(), key.getText(), cipherList.getValue()));
             }
-//            switch(cipherList.getValue()){
-//                case "Enigma":
-//                    enigmaWindow();
-//                    break;
-//                case "Nihilist Cipher":
-//                    TextField squareKey = new TextField();
-//                    layout2.getChildren().clear();
-//                    layout2.getChildren().addAll(key, squareKey, cipherList, help);
-//                    encode.setOnAction(h -> {
-//                        outputText = Nihilist.encode(messageInput.getText(), key.getText(), squareKey.getText());
-//                        outputWindow();
-//                    });
-//            }
         });
 
 
@@ -657,11 +644,6 @@ public class ArchitectApplication extends Application {
         enigmaScene = new Scene(layout, 800, 600);
         window.setScene(enigmaScene);
     }
-
-//    public static void nihilistScene(){
-//
-//    }
-
     /**************************************************************************
      * Gets URL of website
      * @param input URL inputted by user
@@ -676,7 +658,9 @@ public class ArchitectApplication extends Application {
         }
 
     }
-
+    /**************************************************************************
+     * add values to the table in database
+     *************************************************************************/
     @Override
     public void init() throws Exception {
         springContext = SpringApplication.run(ArchitectApplication.class);
@@ -722,14 +706,17 @@ public class ArchitectApplication extends Application {
         trigramService.save(his);
         Trigram oft = new Trigram(20, "oft", 0.24);
         trigramService.save(oft);
-
     }
-
+    /**************************************************************************
+     * stop database
+     *************************************************************************/
     @Override
     public void stop() throws Exception {
         springContext.stop();
     }
-
+    /**************************************************************************
+     * connect to database in memory
+     *************************************************************************/
     @Bean(initMethod = "start", destroyMethod = "stop")
     public Server inMemoryDBServer() throws SQLException {
         return Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "9092");

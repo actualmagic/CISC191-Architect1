@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 public class Nihilist {
+    /**************************************************************************
+     * Create polybiusSquare based on the key provided
+     * @param key input from user
+     * @return the polybiusSquare
+     *************************************************************************/
     private static char[][] polybiusSquare(String key) {
         key = key.toUpperCase();
         char[][] polybiusSquare = new char[5][5];
@@ -29,7 +34,13 @@ public class Nihilist {
         }
         return polybiusSquare;
     }
-
+    /**************************************************************************
+     * encode message from user
+     * @param inputText message from user
+     * @param key key from user
+     * @param squareKey key for the polybiusSquare
+     * @return encoded message
+     *************************************************************************/
     public static String encode(String inputText, String key, String squareKey) {
         char[][] polybiusSquare = polybiusSquare(squareKey);
         StringBuilder encryptedMessage = new StringBuilder();
@@ -65,7 +76,13 @@ public class Nihilist {
 
         return encryptedMessage.toString().trim();
     }
-
+    /**************************************************************************
+     * decodes the encoded message
+     * @param encryptedText the encrypted text
+     * @param key key input from user
+     * @param squareKey the key for the polybiusSquare
+     * @return the polybiusSquare
+     *************************************************************************/
     public static String decode(String encryptedText, String key, String squareKey) {
         char[][] polybiusSquare = polybiusSquare(squareKey);
         StringBuilder decryptedMessage = new StringBuilder();
@@ -100,7 +117,12 @@ public class Nihilist {
         }
         return decryptedMessage.toString();
     }
-
+    /**************************************************************************
+     * Find the coordinates of the letters on the polybius Square
+     * @param polybiusSquare the polybiusSquare created based on the squareKey
+     * @param c the character being searched for
+     * @return the polybiusSquare
+     *************************************************************************/
     private static ArrayList<Integer> findCoordinates(char[][] polybiusSquare, char c) {
         ArrayList<Integer> coordinates = new ArrayList<>();
 

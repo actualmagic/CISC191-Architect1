@@ -112,7 +112,11 @@ public class CipherTools {
         }
         return integer;
     }
-
+    /**************************************************************************
+     * Find the trigram score by adding the frequencies from the database when found in the string
+     * @param input String of possible decoded message
+     * @return the trigram score the string got based on the table in the database
+     *************************************************************************/
     public static double trigramScore(String input) throws SQLException {
         input = input.toLowerCase();
         double totalFrequency = 0;

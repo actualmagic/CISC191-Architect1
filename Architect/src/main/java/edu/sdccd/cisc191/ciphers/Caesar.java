@@ -85,13 +85,25 @@ public class Caesar extends CipherTools {
         return decode(inputText, String.valueOf(chiLow));
     }
 
+    /**************************************************************************
+     * sorts array of numbers
+     * @param chiSquared array of numbers to be sorted
+     * @param start start of array
+     * @param end end of array
+     *************************************************************************/
     private static void quickSort(double[] chiSquared, int start, int end) {
         if(end<=start) return;
         int pivot = partition(chiSquared, start, end);
         quickSort(chiSquared, start, pivot-1);
         quickSort(chiSquared, pivot+1, end);
     }
-
+    /**************************************************************************
+     * compare and swap numbers
+     * @param chiSquared array of numbers to be sorted
+     * @param start start of array
+     * @param end end of the array
+     * @return the new pivot
+     *************************************************************************/
     private static int partition(double[] chiSquared, int start, int end){
         double pivot = chiSquared[end];
         int i = start - 1;
